@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FormulaVault - Smart Study App</title>
+    <!-- KaTeX for beautiful formula rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --border: #334155;
+            --input-bg: #0f172a;
+            --card-inner: rgba(15, 23, 42, 0.6);
+            --header-bg: rgba(30, 41, 59, 0.9);
+            --nav-bg: #0f172a;
+            --star-color: #fbbf24;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="light"] {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --accent: #0284c7;
+            --border: #cbd5e1;
+            --input-bg: #f8fafc;
+            --card-inner: #f8fafc;
+            --header-bg: rgba(255, 255, 255, 0.9);
+            --nav-bg: #ffffff;
+            --star-color: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @media (min-width: 481px) {
+            .phone-container {
+                height: 820px;
+                border-radius: 36px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                border: 8px solid var(--border);
+            }
+        }
+
+        .app-header {
+            padding: 12px 20px;
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3);
+        }
+
+        .header-title-box h1 {
+            font-size: 1.15rem;
+            color: var(--accent);
+        }
+
+        .header-title-box p {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        .theme-toggle-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.9);
+        }
+
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeSlideIn 0.35s ease forwards;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .formula-card, .menu-btn, .flashcard, .fotd-card {
+            animation: cardFadeIn 0.4s ease backwards;
+        }
+        .formula-card:nth-child(2) { animation-delay: 0.04s; }
+        .formula-card:nth-child(3) { animation-delay: 0.08s; }
+        .formula-card:nth-child(4) { animation-delay: 0.12s; }
+        .formula-card:nth-child(5) { animation-delay: 0.16s; }
+        .formula-card:nth-child(6) { animation-delay: 0.2s; }
+        .formula-card:nth-child(7) { animation-delay: 0.24s; }
+        .formula-card:nth-child(8) { animation-delay: 0.28s; }
+
+        h2 {
+            font-size: 1.18rem;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        /* Formula of the Day Card */
+        .fotd-card {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(56, 189, 248, 0.1));
+            border: 1px solid var(--accent);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .fotd-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--accent);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .fotd-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .fotd-formula {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+        }
+
+        .menu-btn {
+            width: 100%;
+            padding: 13px 15px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            text-align: left;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s, background 0.2s, transform 0.1s;
+        }
+
+        .menu-btn:hover {
+            border-color: var(--accent);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .menu-btn:active {
+            transform: scale(0.985);
+        }
+
+        .menu-btn.fav-menu-btn {
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+
+        .menu-btn .count-badge {
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-bottom: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text);
+            margin-bottom: 12px;
+            outline: none;
+            font-size: 0.88rem;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        .sub-tabs {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            margin-bottom: 14px;
+            padding-bottom: 4px;
+        }
+
+        .sub-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        .sub-tabs::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .sub-tab-btn {
+            background: var(--input-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .sub-tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .formula-card {
+            background: var(--card-inner);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+            border-top: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .formula-card .sub-badge {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .formula-card h3 {
+            font-size: 0.94rem;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        .formula-card p {
+            font-size: 0.88rem;
+            color: var(--accent);
+            font-family: monospace;
+            margin-bottom: 0;
+            word-break: break-word;
+        }
+
+        .card-svg-box {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+            display: flex;
+            justify-content: center;
+        }
+
+        .icon-action-btn {
+            background: none;
+            border: none;
+            font-size: 1.15rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            line-height: 1;
+            padding: 3px 5px;
+            border-radius: 6px;
+        }
+
+        .icon-action-btn:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+        }
+
+        .fav-star-btn.active {
+            color: var(--star-color);
+        }
+
+        /* Constants & Unit Converter */
+        .constants-table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card-inner);
+            margin-bottom: 15px;
+        }
+
+        .constants-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.83rem;
+        }
+
+        .constants-table th, .constants-table td {
+            padding: 9px 11px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .constants-table th {
+            background: var(--input-bg);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+        }
+
+        .constants-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .constants-table td.val-cell {
+            font-family: monospace;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .converter-box {
+            background: var(--card-inner);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 11px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: var(--input-bg);
+            color: var(--accent);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+        }
+
+        /* 3-Way Mode Switch in Calculator */
+        .mode-switch {
+            display: flex;
+            background: var(--input-bg);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+            gap: 3px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 7px 4px;
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+            font-size: 0.76rem;
+            font-weight: 600;
+            border-radius: 7px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .calc-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .calc-group {
+            margin-bottom: 11px;
+        }
+
+        .calc-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .calc-group input, .calc-group select {
+            width: 100%;
+            padding: 9px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text);
+            outline: none;
+            font-size: 0.88rem;
+        }
+
+        .result-box {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.5;
+            font-size: 0.92rem;
+            color: var(--text);
+        }
+
+        /* Step-by-Step Breakdown Box */
+        .steps-box {
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--success);
+            border-radius: 8px;
+            font-size: 0.84rem;
+            line-height: 1.55;
+            color: var(--text);
+            text-align: left;
+        }
+
+        .steps-box .step-item {
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed var(--border);
+            font-family: monospace;
+        }
+
+        .steps-box .step-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* History List */
+        .history-section {
+            margin-top: 16px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-item {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-item span:last-child {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .std-calc-display {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: right;
+            margin-bottom: 10px;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .std-calc-expr {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            min-height: 16px;
+            word-break: break-all;
+        }
+
+        .std-calc-val {
+            font-size: 1.55rem;
+            font-weight: bold;
+            color: var(--accent);
+            font-family: monospace;
+            overflow-x: auto;
+        }
+
+        .std-calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 7px;
+        }
+
+        .calc-key {
+            padding: 12px 0;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .calc-key:active {
+            transform: scale(0.96);
+        }
+
+        .calc-key.op {
+            color: var(--accent);
+            background: rgba(56, 189, 248, 0.08);
+        }
+
+        .calc-key.clear {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .calc-key.eq {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Quiz Styles */
+        .quiz-stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .quiz-stats-bar span b {
+            color: var(--accent);
+        }
+
+        .flashcard {
+    background: var(--input-bg);
+    min-height: 185px;
+    border-radius: 16px;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    margin-bottom: 14px;
+    user-select: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    perspective: 1200px; /* задаёт глубину 3D */
+    transition: border-color 0.2s;
+}
+
+.flashcard:hover {
+    border-color: var(--accent);
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    min-height: 185px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+.card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    border-radius: 16px;
+}
+
+.card-back {
+    transform: rotateY(180deg); /* оборот изначально повёрнут */
+}
+
+        .quiz-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-got-it {
+            background: var(--success);
+        }
+
+        .btn-review {
+            background: var(--warning);
+            color: #0f172a;
+        }
+
+        /* Toast Notification */
+        .toast-msg {
+            position: absolute;
+            bottom: 78px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s, transform 0.25s;
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .nav-bar {
+            height: 64px;
+            background: var(--nav-bg);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.68rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+        }
+
+        .nav-item svg {
+            width: 19px;
+            height: 19px;
+            fill: currentColor;
+        }
+
+        /* ===== CENTERED SOLVER NAV ITEM ===== */
+        .nav-item.solver-highlight {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white !important;
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            justify-content: center;
+            margin-top: -18px;
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.45);
+            border: 3px solid var(--nav-bg);
+            position: relative;
+            z-index: 2;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .nav-item.solver-highlight svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav-item.solver-highlight span {
+            display: none;
+        }
+
+        .nav-item.solver-highlight:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 8px 22px rgba(79, 70, 229, 0.6);
+        }
+
+        .nav-item.solver-highlight.active {
+            box-shadow: 0 0 0 3px var(--accent), 0 6px 18px rgba(79, 70, 229, 0.6);
+        }
+
+        /* ===== REVERSE SOLVER ===== */
+        .reverse-solver-section {
+            margin-top: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+        }
+        .reverse-solver-section h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .variable-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .var-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .var-checkbox:hover {
+            border-color: var(--accent);
+        }
+        .var-checkbox input {
+            accent-color: var(--primary);
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+        }
+        .var-checkbox.checked {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.12);
+        }
+        .reverse-results .formula-card {
+            animation: cardFadeIn 0.3s ease backwards;
+        }
+        .reverse-hint {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+        .solver-quick-link {
+            display: block;
+            width: 100%;
+            margin-bottom: 14px;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(56, 189, 248, 0.12));
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .solver-quick-link:hover {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.28), rgba(56, 189, 248, 0.2));
+        }
+        .solver-hero {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(56, 189, 248, 0.1));
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .solver-hero h2 { margin-bottom: 6px; }
+        .solver-hero p { margin-bottom: 0; }
+
+        /* ===== EXAM PRACTICE ===== */
+        .exam-question {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            animation: cardFadeIn 0.35s ease backwards;
+        }
+        .exam-question .q-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        .exam-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-inner);
+            color: var(--text);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .exam-option:hover {
+            border-color: var(--accent);
+        }
+        .exam-option.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.15);
+        }
+        .exam-option.wrong {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.12);
+        }
+        .exam-option:disabled {
+            cursor: default;
+        }
+        .exam-score-box {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(56, 189, 248, 0.1));
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+        .exam-score-box .big-score {
+            font-size: 1.8rem;
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        /* ===== KATEX OVERRIDES ===== */
+        .katex { font-size: 1em !important; }
+        .formula-card .katex-display { margin: 0; }
+        .fotd-formula .katex { color: var(--accent); }
+
+        /* ===== PDF / PRINT ===== */
+        @media print {
+            body { background: white; display: block; }
+            .phone-container { max-width: 100%; height: auto; border: none; box-shadow: none; border-radius: 0; }
+            .app-header, .nav-bar, .theme-toggle-btn, .back-btn, .search-box,
+            .sub-tabs, .mode-switch, .calc-group, .btn, .result-box, .steps-box,
+            .history-section, .quiz-stats-bar, .quiz-actions, .card-actions,
+            .reverse-solver-section, .exam-option, .exam-score-box,
+            .solver-quick-link, .solver-hero { display: none !important; }
+            .app-content { overflow: visible; padding: 0; }
+            .screen { display: none !important; }
+            #screen-formulas { display: block !important; }
+            #subject-menu, #subject-sections { display: none !important; }
+            #formula-view { display: block !important; }
+            .formula-card {
+                break-inside: avoid;
+                border: 1px solid #ccc !important;
+                border-left: 4px solid #4f46e5 !important;
+                background: #fff !important;
+                color: #000 !important;
+                box-shadow: none !important;
+                animation: none !important;
+            }
+            .formula-card p { color: #333 !important; }
+            .formula-card h3 { color: #000 !important; }
+            .formula-card .sub-badge { color: #666 !important; }
+            .katex { color: #000 !important; }
+            body { color: #000; }
+            h2, p { color: #000 !important; }
+        }
+        .print-header {
+            display: none;
+            text-align: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+        @media print {
+            .print-header { display: block !important; }
+            .print-header h1 { color: #4f46e5; font-size: 1.6rem; }
+            .print-header p { color: #666; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div class="app-header">
+            <div class="header-brand">
+                <div class="brand-logo">∑</div>
+                <div class="header-title-box">
+                    <h1>FormulaVault</h1>
+                    <p>Smart Study App</p>
+                </div>
+            </div>
+            <button class="theme-toggle-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle Theme">🌙</button>
+        </div>
+
+        <div class="app-content">
+            
+            <!-- ЭКРАН 0: Приветствие + Formula of the Day -->
+            <div id="screen-welcome" class="screen active">
+                <h2>Welcome to FormulaVault! 🚀</h2>
+                <p>Interactive pocket handbook for exact sciences (Grades 1–10). Find formulas, convert SI units, solve problems step-by-step, and practice with flashcards.</p>
+                
+                <div class="fotd-card" id="fotd-container">
+                    <div class="fotd-label">
+                        <span>✨ Formula of the Day</span>
+                        <span id="fotd-subj">Physics</span>
+                    </div>
+                    <div class="fotd-title" id="fotd-name">Loading...</div>
+                    <div class="fotd-formula" id="fotd-expr">...</div>
+                </div>
+
+                <p><b>Key Features:</b><br>
+                📐 Math & Physics Library + Visual Diagrams & Favorites (★)<br>
+                📊 Constants Table & SI Unit Converter<br>
+                🧮 Quick Calc, Step-by-Step Solver & Standard Calc<br>
+                🧠 Smart Quiz with Missed-Cards Practice<br>
+                🔍 Reverse Solver (find formulas by variables you have)<br>
+                📝 Exam Practice (multiple-choice test mode)<br>
+                🖨️ Print / Save Cheat Sheet (PDF-ready)</p>
+                
+                <button class="btn" onclick="switchMainTab('formulas', document.querySelectorAll('.nav-item')[1])">Explore Formulas</button>
+                <button class="btn" style="margin-top:8px; background: var(--success);" onclick="switchMainTab('exam', document.querySelectorAll('.nav-item')[6])">📝 Start Exam Practice</button>
+            </div>
+
+            <!-- ЭКРАН 1: Справочник -->
+            <div id="screen-formulas" class="screen">
+                <div id="subject-menu">
+                    <h2>Choose a Subject</h2>
+                    <p>Select a subject, open favorites, or search directly.</p>
+                    <input type="text" class="search-box" id="global-search" placeholder="Search any formula..." oninput="handleGlobalSearch(this.value)">
+                    <div id="global-search-results" style="margin-bottom: 12px;"></div>
+
+                    <!-- Ссылка на Reverse Solver (отдельный экран) -->
+                    <button class="solver-quick-link" onclick="switchMainTab('reverse', document.querySelectorAll('.nav-item')[2])">
+                        <span>🔍 Reverse Solver — find formulas by known variables</span>
+                        <span>➔</span>
+                    </button>
+
+                    <div id="default-subjects"></div>
+                </div>
+
+                <div id="subject-sections" style="display: none;">
+                    <button class="back-btn" onclick="backToSubjects()">← Back to Subjects</button>
+                    <h2 id="subject-title">Topics</h2>
+                    <div id="dynamic-category-list"></div>
+                </div>
+
+                <div id="formula-view" style="display: none;">
+                    <button class="back-btn" id="formula-back-btn" onclick="backToSections()">← Back to Topics</button>
+                    <h2 id="category-title">Formulas</h2>
+                    <div class="print-header">
+                        <h1>FormulaVault Cheat Sheet</h1>
+                        <p id="print-subtitle">Selected formulas</p>
+                    </div>
+                    <input type="text" class="search-box" id="search" placeholder="Search in this view..." oninput="renderFormulas()">
+                    <button class="btn-secondary" id="print-btn" onclick="window.print()" style="margin-bottom:12px; width:100%;">🖨️ Print / Save Cheat Sheet (PDF)</button>
+                    
+                    <div id="sub-tabs-container" class="sub-tabs"></div>
+                    <div id="formula-list"></div>
+                </div>
+            </div>
+
+            <!-- ЭКРАН 2: Reverse Solver (в центре навигации) -->
+            <div id="screen-reverse" class="screen">
+                <div class="solver-hero">
+                    <h2>🔍 Reverse Solver</h2>
+                    <p>Tick the variables you have in the problem — we'll instantly highlight every formula you can apply.</p>
+                </div>
+                <div class="variable-checkboxes" id="reverse-checkboxes-standalone"></div>
+                <div id="reverse-results-standalone" class="reverse-results"></div>
+            </div>
+
+            <!-- ЭКРАН 3: Таблица констант + Конвертер СИ -->
+            <div id="screen-constants" class="screen">
+                <div class="mode-switch">
+                    <button class="mode-btn active" id="tab-btn-const" onclick="switchConstTab('table')">📊 Constants Table</button>
+                    <button class="mode-btn" id="tab-btn-conv" onclick="switchConstTab('converter')">🔄 SI Unit Converter</button>
+                </div>
+
+                <div id="const-view-table">
+                    <h2>Constants Table</h2>
+                    <p>Fundamental mathematical and physical constants (Grades 1–10).</p>
+                    <input type="text" class="search-box" id="constants-search" placeholder="Search constant name or symbol..." oninput="renderConstants()">
+                    <div class="constants-table-container">
+                        <table class="constants-table">
+                            <thead>
+                                <tr>
+                                    <th>Constant</th>
+                                    <th>Symbol</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="constants-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="const-view-converter" style="display: none;">
+                    <h2>SI Unit Converter</h2>
+                    <p>Convert common school physics units into standard SI units.</p>
+                    <div class="converter-box">
+                        <div class="calc-group">
+                            <label>Physical Quantity:</label>
+                            <select id="conv-type" onchange="runUnitConversion()">
+                                <option value="speed">Speed: km/h ➔ m/s</option>
+                                <option value="speed_rev">Speed: m/s ➔ km/h</option>
+                                <option value="temp">Temperature: °C ➔ Kelvin (K)</option>
+                                <option value="temp_rev">Temperature: Kelvin (K) ➔ °C</option>
+                                <option value="pressure">Pressure: kPa ➔ Pa</option>
+                                <option value="atm">Pressure: atm ➔ Pa</option>
+                                <option value="mass">Mass: grams (g) ➔ kg</option>
+                                <option value="volume">Volume: Liters (L) ➔ m³</option>
+                            </select>
+                        </div>
+                        <div class="calc-group">
+                            <label>Enter Value:</label>
+                            <input type="number" step="any" id="conv-input" placeholder="e.g. 72" oninput="runUnitConversion()">
+                        </div>
+                        <div class="result-box" id="conv-result">Converted: —</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ЭКРАН 4: Калькулятор (3 режима) -->
+            <div id="screen-calc" class="screen">
+                <div class="mode-switch">
+                    <button class="mode-btn active" id="mode-btn-quick" onclick="switchCalcMode('quick')">📐 Quick Calc</button>
+                    <button class="mode-btn" id="mode-btn-steps" onclick="switchCalcMode('steps')">📝 Step-by-Step</button>
+                    <button class="mode-btn" id="mode-btn-standard" onclick="switchCalcMode('standard')">🔢 Standard</button>
+                </div>
+
+                <!-- Общая форма для Quick Calc и Step-by-Step -->
+                <div id="calc-formula-wrapper">
+                    <div class="calc-top-bar">
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);" id="calc-mode-desc">Instant result calculation</span>
+                        <button class="btn-secondary" onclick="loadCalcExample()">⚡ Load Example</button>
+                    </div>
+
+                    <div class="calc-group">
+                        <label>Select Formula:</label>
+                        <select id="calc-select" onchange="updateCalcFields()">
+                            <optgroup label="Physics">
+                                <option value="newton">Newton's 2nd Law (F = m · a)</option>
+                                <option value="gravity">Force of Gravity (F_g = m · g)</option>
+                                <option value="kinetic">Kinetic Energy (E_k = mv² / 2)</option>
+                                <option value="displacement">Displacement (S = v₀t + at² / 2)</option>
+                                <option value="ohm">Ohm's Law (I = U / R)</option>
+                                <option value="pressure">Hydrostatic Pressure (P = ρ · g · h)</option>
+                                <option value="idealgas">Ideal Gas Pressure (p = νRT / V)</option>
+                            </optgroup>
+                            <optgroup label="Mathematics">
+                                <option value="quadratic">Quadratic Equation (ax² + bx + c = 0)</option>
+                                <option value="pythagoras">Pythagorean Hypotenuse (c = √(a² + b²))</option>
+                                <option value="log">Logarithm Base a (logₐ(x))</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div id="calc-inputs"></div>
+                    <button class="btn" onclick="calculateResult()">Calculate</button>
+                    
+                    <div class="result-box" id="calc-result">Result: —</div>
+                    <div class="steps-box" id="calc-steps" style="display: none;"></div>
+
+                    <!-- История вычислений -->
+                    <div class="history-section" id="formula-history-section" style="display: none;">
+                        <div class="history-header">
+                            <span>Recent Calculations</span>
+                            <button style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.75rem;" onclick="clearCalcHistory()">Clear</button>
+                        </div>
+                        <div id="formula-history-list"></div>
+                    </div>
+                </div>
+
+                <!-- Стандартный калькулятор -->
+                <div id="calc-mode-standard" style="display: none;">
+                    <div class="std-calc-display">
+                        <div class="std-calc-expr" id="std-expr"></div>
+                        <div class="std-calc-val" id="std-val">0</div>
+                    </div>
+                    <div class="std-calc-grid">
+                        <button class="calc-key clear" onclick="stdClear()">C</button>
+                        <button class="calc-key op" onclick="stdBackspace()">⌫</button>
+                        <button class="calc-key op" onclick="stdAppend('(')">(</button>
+                        <button class="calc-key op" onclick="stdAppend(')')">)</button>
+
+                        <button class="calc-key op" onclick="stdFunc('sqrt')">√</button>
+                        <button class="calc-key op" onclick="stdAppend('**')">xʸ</button>
+                        <button class="calc-key op" onclick="stdAppend('%')">%</button>
+                        <button class="calc-key op" onclick="stdAppend('/')">÷</button>
+
+                        <button class="calc-key" onclick="stdAppend('7')">7</button>
+                        <button class="calc-key" onclick="stdAppend('8')">8</button>
+                        <button class="calc-key" onclick="stdAppend('9')">9</button>
+                        <button class="calc-key op" onclick="stdAppend('*')">×</button>
+
+                        <button class="calc-key" onclick="stdAppend('4')">4</button>
+                        <button class="calc-key" onclick="stdAppend('5')">5</button>
+                        <button class="calc-key" onclick="stdAppend('6')">6</button>
+                        <button class="calc-key op" onclick="stdAppend('-')">−</button>
+
+                        <button class="calc-key" onclick="stdAppend('1')">1</button>
+                        <button class="calc-key" onclick="stdAppend('2')">2</button>
+                        <button class="calc-key" onclick="stdAppend('3')">3</button>
+                        <button class="calc-key op" onclick="stdAppend('+')">+</button>
+
+                        <button class="calc-key" onclick="stdAppend('0')">0</button>
+                        <button class="calc-key" onclick="stdAppend('.')">.</button>
+                        <button class="calc-key op" onclick="stdAppend('3.14159265')">π</button>
+                        <button class="calc-key eq" onclick="stdEvaluate()">=</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ЭКРАН 5: Квиз -->
+            <div id="screen-quiz" class="screen">
+                <h2>Knowledge Check</h2>
+                <p>Select a subject, tap the card to flip, and track your score.</p>
+                
+                <div class="sub-tabs" id="quiz-filter-tabs">
+                    <button class="sub-tab-btn active" onclick="setQuizSubject('All', this)">All Subjects</button>
+                    <button class="sub-tab-btn" onclick="setQuizSubject('Mathematics', this)">📐 Mathematics</button>
+                    <button class="sub-tab-btn" onclick="setQuizSubject('Physics', this)">⚡ Physics</button>
+                    <button class="sub-tab-btn" onclick="setQuizSubject('Favorites', this)">★ Favorites</button>
+                </div>
+
+                <div class="quiz-stats-bar">
+                    <span id="quiz-progress">Card 1 / 10</span>
+                    <span>Mastered: <b id="quiz-score">0</b> | Missed: <b id="quiz-missed" style="color:var(--warning);">0</b></span>
+                </div>
+
+                <div class="flashcard" id="flashcard" onclick="flipCard()">
+                    <div id="card-text">
+                        <b>Loading question...</b>
+                    </div>
+                </div>
+
+                <div id="quiz-controls">
+                    <button class="btn" id="quiz-reveal-btn" onclick="flipCard()">Show Answer</button>
+                    <div class="quiz-actions" id="quiz-rate-btns" style="display: none;">
+                        <button class="btn btn-review" onclick="rateCard(false)">🔄 Review Again</button>
+                        <button class="btn btn-got-it" onclick="rateCard(true)">✅ Got It</button>
+                    </div>
+                    <button class="btn btn-review" id="quiz-practice-missed-btn" style="display: none; margin-top: 8px;" onclick="practiceMissedCards()">Practice Missed Cards</button>
+                </div>
+            </div>
+
+            <!-- ЭКРАН 6: Exam Practice -->
+            <div id="screen-exam" class="screen">
+                <h2>📝 Exam Practice</h2>
+                <p>Answer 5 random multiple-choice questions to test your formula knowledge.</p>
+                <button class="btn" id="exam-start-btn" onclick="startExam()" style="margin-bottom:12px;">Start New Test</button>
+                <div id="exam-results"></div>
+            </div>
+
+        </div>
+
+        <!-- Всплывающее уведомление (Toast) -->
+        <div class="toast-msg" id="toast">Copied to clipboard!</div>
+
+        <!-- Нижняя навигация: Home · Formulas · SOLVER (центр) · Constants · Calculator · Quiz · Exam -->
+        <div class="nav-bar">
+            <button class="nav-item active" onclick="switchMainTab('welcome', this)">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                Home
+            </button>
+            <button class="nav-item" onclick="switchMainTab('formulas', this)">
+                <svg viewBox="0 0 24 24"><path d="M4 6H20V8H4V6M4 11H20V13H4V11M4 16H20V18H4V16Z"/></svg>
+                Formulas
+            </button>
+            <button class="nav-item solver-highlight" onclick="switchMainTab('reverse', this)" title="Reverse Solver">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                Solver
+            </button>
+            <button class="nav-item" onclick="switchMainTab('constants', this)">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M11 17H7V15H11V17M17 17H13V15H17V17M11 13H7V11H11V13M17 13H13V11H17V13M11 9H7V7H11V9M17 9H13V7H17V9Z"/></svg>
+                Constants
+            </button>
+            <button class="nav-item" onclick="switchMainTab('calc', this)">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M17 17H7V15H17V17M17 13H7V11H17V13M17 9H7V7H17V9Z"/></svg>
+                Calc
+            </button>
+            <button class="nav-item" onclick="switchMainTab('quiz', this)">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.02-.42 1.94-1.07 2.75z"/></svg>
+                Quiz
+            </button>
+            <button class="nav-item" onclick="switchMainTab('exam', this)">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                Exam
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ===== SVG Diagrams =====
+        const svgDiagrams = {
+            "Pythagorean Theorem": `<svg width="160" height="75" viewBox="0 0 160 75">
+                <polygon points="30,60 120,60 30,15" fill="rgba(56,189,248,0.12)" stroke="#38bdf8" stroke-width="2"/>
+                <rect x="30" y="50" width="10" height="10" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+                <text x="16" y="42" fill="#f8fafc" font-size="11" font-family="monospace">a</text>
+                <text x="72" y="72" fill="#f8fafc" font-size="11" font-family="monospace">b</text>
+                <text x="80" y="34" fill="#38bdf8" font-size="11" font-weight="bold" font-family="monospace">c</text>
+            </svg>`,
+            "Projectile: Horizontal Range": `<svg width="180" height="75" viewBox="0 0 180 75">
+                <line x1="15" y1="62" x2="165" y2="62" stroke="#94a3b8" stroke-width="1.5"/>
+                <path d="M 25 62 Q 90 5 155 62" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 2"/>
+                <line x1="25" y1="62" x2="55" y2="35" stroke="#fbbf24" stroke-width="2"/>
+                <text x="48" y="33" fill="#fbbf24" font-size="10" font-family="monospace">v₀</text>
+                <text x="40" y="58" fill="#94a3b8" font-size="10" font-family="monospace">α</text>
+                <text x="82" y="73" fill="#38bdf8" font-size="10" font-family="monospace">S_x</text>
+            </svg>`,
+            "Discriminant": `<svg width="160" height="75" viewBox="0 0 160 75">
+                <line x1="15" y1="52" x2="145" y2="52" stroke="#94a3b8" stroke-width="1.2"/>
+                <line x1="80" y1="10" x2="80" y2="68" stroke="#94a3b8" stroke-width="1.2"/>
+                <path d="M 38 15 Q 80 82 122 15" fill="none" stroke="#38bdf8" stroke-width="2"/>
+                <circle cx="54" cy="52" r="3" fill="#fbbf24"/>
+                <circle cx="106" cy="52" r="3" fill="#fbbf24"/>
+                <text x="42" y="45" fill="#fbbf24" font-size="10" font-family="monospace">x₁</text>
+                <text x="110" y="45" fill="#fbbf24" font-size="10" font-family="monospace">x₂</text>
+            </svg>`
+        };
+
+        // ===== KaTeX Auto-Render Helper =====
+        function renderMathInElement(el) {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(el, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        // ===== FORMULAS DATA =====
+        const formulas = [
+            // ================= MATHEMATICS =================
+            { subject: "Mathematics", category: "Algebraic Identities", sub: "Squares", name: "Square of a Sum", formula: "(a + b)² = a² + 2ab + b²", latex: "$$(a + b)^2 = a^2 + 2ab + b^2$$" },
+            { subject: "Mathematics", category: "Algebraic Identities", sub: "Squares", name: "Square of a Difference", formula: "(a - b)² = a² - 2ab + b²", latex: "$$(a - b)^2 = a^2 - 2ab + b^2$$" },
+            { subject: "Mathematics", category: "Algebraic Identities", sub: "Squares", name: "Difference of Squares", formula: "a² - b² = (a - b)(a + b)", latex: "$$a^2 - b^2 = (a - b)(a + b)$$" },
+            { subject: "Mathematics", category: "Algebraic Identities", sub: "Cubes", name: "Sum of Cubes", formula: "a³ + b³ = (a + b)(a² - ab + b²)", latex: "$$a^3 + b^3 = (a + b)(a^2 - ab + b^2)$$" },
+            { subject: "Mathematics", category: "Algebraic Identities", sub: "Cubes", name: "Difference of Cubes", formula: "a³ - b³ = (a - b)(a² + ab + b²)", latex: "$$a^3 - b^3 = (a - b)(a^2 + ab + b^2)$$" },
+            { subject: "Mathematics", category: "Algebraic Identities", sub: "Cubes", name: "Cube of a Sum", formula: "(a + b)³ = a³ + 3a²b + 3ab² + b³", latex: "$$(a + b)^3 = a^3 + 3a^2b + 3ab^2 + b^3$$" },
+            { subject: "Mathematics", category: "Algebraic Identities", sub: "Cubes", name: "Cube of a Difference", formula: "(a - b)³ = a³ - 3a²b + 3ab² - b³", latex: "$$(a - b)^3 = a^3 - 3a^2b + 3ab^2 - b^3$$" },
+
+            { subject: "Mathematics", category: "Powers & Roots", sub: "Powers", name: "Zero & Negative Exponent", formula: "a⁰ = 1,  a⁻ⁿ = 1 / aⁿ", latex: "$$a^0 = 1, \\quad a^{-n} = \\frac{1}{a^n}$$" },
+            { subject: "Mathematics", category: "Powers & Roots", sub: "Powers", name: "Product of Powers", formula: "aⁿ · aᵐ = aⁿ⁺ᵐ", latex: "$$a^n \\cdot a^m = a^{n+m}$$" },
+            { subject: "Mathematics", category: "Powers & Roots", sub: "Powers", name: "Quotient of Powers", formula: "aⁿ / aᵐ = aⁿ⁻ᵐ", latex: "$$\\frac{a^n}{a^m} = a^{n-m}$$" },
+            { subject: "Mathematics", category: "Powers & Roots", sub: "Powers", name: "Power of a Power", formula: "(aⁿ)ᵐ = aⁿ·ᵐ", latex: "$$(a^n)^m = a^{n \\cdot m}$$" },
+            { subject: "Mathematics", category: "Powers & Roots", sub: "Powers", name: "Power of Product & Quotient", formula: "(a · b)ⁿ = aⁿ · bⁿ,  (a / b)ⁿ = aⁿ / bⁿ", latex: "$$(a b)^n = a^n b^n, \\quad \\left(\\frac{a}{b}\\right)^n = \\frac{a^n}{b^n}$$" },
+            { subject: "Mathematics", category: "Powers & Roots", sub: "Roots", name: "Fractional Exponent", formula: "a^(m/n) = ⁿ√(aᵐ)", latex: "$$a^{m/n} = \\sqrt[n]{a^m}$$" },
+            { subject: "Mathematics", category: "Powers & Roots", sub: "Roots", name: "Product & Quotient of Roots", formula: "ⁿ√(ab) = ⁿ√a · ⁿ√b,  ⁿ√(a/b) = ⁿ√a / ⁿ√b", latex: "$$\\sqrt[n]{ab} = \\sqrt[n]{a} \\cdot \\sqrt[n]{b}, \\quad \\sqrt[n]{\\frac{a}{b}} = \\frac{\\sqrt[n]{a}}{\\sqrt[n]{b}}$$" },
+            { subject: "Mathematics", category: "Powers & Roots", sub: "Roots", name: "Root of a Root", formula: "ᵐ√(ⁿ√a) = ᵐⁿ√a", latex: "$$\\sqrt[m]{\\sqrt[n]{a}} = \\sqrt[mn]{a}$$" },
+
+            { subject: "Mathematics", category: "Logarithms", sub: "Basic Properties", name: "Definition of Logarithm", formula: "logₐ(b) = x ⇔ aˣ = b (a > 0, a ≠ 1, b > 0)", latex: "$$\\log_a b = x \\Leftrightarrow a^x = b \\quad (a>0, a\\neq 1, b>0)$$" },
+            { subject: "Mathematics", category: "Logarithms", sub: "Basic Properties", name: "Main Logarithmic Identity", formula: "a^(logₐ b) = b", latex: "$$a^{\\log_a b} = b$$" },
+            { subject: "Mathematics", category: "Logarithms", sub: "Basic Properties", name: "Logarithm of 1 & Base", formula: "logₐ(1) = 0,  logₐ(a) = 1", latex: "$$\\log_a 1 = 0, \\quad \\log_a a = 1$$" },
+            { subject: "Mathematics", category: "Logarithms", sub: "Operations", name: "Logarithm of a Product", formula: "logₐ(x · y) = logₐ(x) + logₐ(y)", latex: "$$\\log_a(xy) = \\log_a x + \\log_a y$$" },
+            { subject: "Mathematics", category: "Logarithms", sub: "Operations", name: "Logarithm of a Quotient", formula: "logₐ(x / y) = logₐ(x) - logₐ(y)", latex: "$$\\log_a\\frac{x}{y} = \\log_a x - \\log_a y$$" },
+            { subject: "Mathematics", category: "Logarithms", sub: "Operations", name: "Logarithm of a Power", formula: "logₐ(xᵖ) = p · logₐ(x)", latex: "$$\\log_a(x^p) = p \\log_a x$$" },
+            { subject: "Mathematics", category: "Logarithms", sub: "Operations", name: "Power in the Base", formula: "log_(aᵏ)(x) = (1/k) · logₐ(x)", latex: "$$\\log_{a^k} x = \\frac{1}{k}\\log_a x$$" },
+            { subject: "Mathematics", category: "Logarithms", sub: "Base Change", name: "Base Change Formula", formula: "logₐ(b) = log꜀(b) / log꜀(a)", latex: "$$\\log_a b = \\frac{\\log_c b}{\\log_c a}$$" },
+            { subject: "Mathematics", category: "Logarithms", sub: "Base Change", name: "Reciprocal Base & Argument", formula: "logₐ(b) = 1 / log_b(a)", latex: "$$\\log_a b = \\frac{1}{\\log_b a}$$" },
+
+            // Trigonometry
+            { subject: "Mathematics", category: "Trigonometry", sub: "Basic Identities", name: "Pythagorean Identity", formula: "sin²α + cos²α = 1", latex: "$$\\sin^2\\alpha + \\cos^2\\alpha = 1$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Basic Identities", name: "Tangent & Cotangent Definition", formula: "tg α = sin α / cos α,  ctg α = cos α / sin α", latex: "$$\\tg\\alpha = \\frac{\\sin\\alpha}{\\cos\\alpha}, \\quad \\ctg\\alpha = \\frac{\\cos\\alpha}{\\sin\\alpha}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Basic Identities", name: "Tangent-Secant Identity", formula: "tg²α + 1 = 1 / cos²α", latex: "$$\\tg^2\\alpha + 1 = \\frac{1}{\\cos^2\\alpha}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Basic Identities", name: "Cotangent-Cosecant Identity", formula: "ctg²α + 1 = 1 / sin²α", latex: "$$\\ctg^2\\alpha + 1 = \\frac{1}{\\sin^2\\alpha}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Basic Identities", name: "Tangent & Cotangent Product", formula: "tg α · ctg α = 1", latex: "$$\\tg\\alpha \\cdot \\ctg\\alpha = 1$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Reduction Formulas", name: "Reduction: Sine (π/2 ± α, π ± α)", formula: "sin(π/2 - α) = cos α,  sin(π - α) = sin α", latex: "$$\\sin\\left(\\frac{\\pi}{2}-\\alpha\\right) = \\cos\\alpha, \\quad \\sin(\\pi-\\alpha)=\\sin\\alpha$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Reduction Formulas", name: "Reduction: Cosine (π/2 ± α, π ± α)", formula: "cos(π/2 - α) = sin α,  cos(π - α) = -cos α", latex: "$$\\cos\\left(\\frac{\\pi}{2}-\\alpha\\right) = \\sin\\alpha, \\quad \\cos(\\pi-\\alpha)=-\\cos\\alpha$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Reduction Formulas", name: "Reduction: Tangent & Cotangent (π ± α)", formula: "tg(π - α) = -tg α,  ctg(π - α) = -ctg α", latex: "$$\\tg(\\pi-\\alpha) = -\\tg\\alpha, \\quad \\ctg(\\pi-\\alpha) = -\\ctg\\alpha$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Addition Formulas", name: "Sine of Sum & Difference", formula: "sin(α ± β) = sinα·cosβ ± sinβ·cosα", latex: "$$\\sin(\\alpha \\pm \\beta) = \\sin\\alpha\\cos\\beta \\pm \\sin\\beta\\cos\\alpha$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Addition Formulas", name: "Cosine of Sum & Difference", formula: "cos(α ± β) = cosα·cosβ ∓ sinα·sinβ", latex: "$$\\cos(\\alpha \\pm \\beta) = \\cos\\alpha\\cos\\beta \\mp \\sin\\alpha\\sin\\beta$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Addition Formulas", name: "Tangent of Sum & Difference", formula: "tg(α ± β) = (tgα ± tgβ) / (1 ∓ tgα·tgβ)", latex: "$$\\tg(\\alpha \\pm \\beta) = \\frac{\\tg\\alpha \\pm \\tg\\beta}{1 \\mp \\tg\\alpha \\cdot \\tg\\beta}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Double Angle", name: "Double-Angle Sine", formula: "sin(2α) = 2 · sinα · cosα", latex: "$$\\sin(2\\alpha) = 2\\sin\\alpha\\cos\\alpha$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Double Angle", name: "Double-Angle Cosine", formula: "cos(2α) = cos²α - sin²α = 2cos²α - 1 = 1 - 2sin²α", latex: "$$\\cos(2\\alpha) = \\cos^2\\alpha - \\sin^2\\alpha = 2\\cos^2\\alpha - 1 = 1 - 2\\sin^2\\alpha$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Double Angle", name: "Double-Angle Tangent", formula: "tg(2α) = 2tgα / (1 - tg²α)", latex: "$$\\tg(2\\alpha) = \\frac{2\\tg\\alpha}{1 - \\tg^2\\alpha}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Half Angle", name: "Half-Angle Formulas (Power-Reducing)", formula: "sin²α = (1 - cos 2α)/2,  cos²α = (1 + cos 2α)/2", latex: "$$\\sin^2\\alpha = \\frac{1-\\cos 2\\alpha}{2}, \\quad \\cos^2\\alpha = \\frac{1+\\cos 2\\alpha}{2}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Half Angle", name: "Tangent of Half Angle", formula: "tg²(α/2) = (1 - cos α) / (1 + cos α)", latex: "$$\\tg^2\\frac{\\alpha}{2} = \\frac{1-\\cos\\alpha}{1+\\cos\\alpha}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Sum to Product", name: "Sum & Difference of Sines", formula: "sinα ± sinβ = 2 · sin((α±β)/2) · cos((α∓β)/2)", latex: "$$\\sin\\alpha \\pm \\sin\\beta = 2\\sin\\frac{\\alpha\\pm\\beta}{2}\\cos\\frac{\\alpha\\mp\\beta}{2}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Sum to Product", name: "Sum & Difference of Cosines", formula: "cosα + cosβ = 2 · cos((α+β)/2) · cos((α-β)/2)", latex: "$$\\cos\\alpha + \\cos\\beta = 2\\cos\\frac{\\alpha+\\beta}{2}\\cos\\frac{\\alpha-\\beta}{2}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Sum to Product", name: "Difference of Cosines", formula: "cosα - cosβ = -2 · sin((α+β)/2) · sin((α-β)/2)", latex: "$$\\cos\\alpha - \\cos\\beta = -2\\sin\\frac{\\alpha+\\beta}{2}\\sin\\frac{\\alpha-\\beta}{2}$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Product to Sum", name: "Product of Sines & Cosines", formula: "sinα·sinβ = ½[cos(α-β) - cos(α+β)]", latex: "$$\\sin\\alpha \\sin\\beta = \\frac{1}{2}[\\cos(\\alpha-\\beta) - \\cos(\\alpha+\\beta)]$$" },
+            { subject: "Mathematics", category: "Trigonometry", sub: "Product to Sum", name: "Product of Sine and Cosine", formula: "sinα·cosβ = ½[sin(α-β) + sin(α+β)]", latex: "$$\\sin\\alpha \\cos\\beta = \\frac{1}{2}[\\sin(\\alpha-\\beta) + \\sin(\\alpha+\\beta)]$$" },
+            { subject: "Mathematics", category: "Inverse Trigonometry", sub: "Identities", name: "Arcsine & Arccosine Sum", formula: "arcsin(x) + arccos(x) = π/2  (|x| ≤ 1)", latex: "$$\\arcsin x + \\arccos x = \\frac{\\pi}{2} \\quad (|x|\\le 1)$$" },
+            { subject: "Mathematics", category: "Inverse Trigonometry", sub: "Identities", name: "Arctangent & Arccotangent Sum", formula: "arctg(x) + arcctg(x) = π/2  (x ∈ ℝ)", latex: "$$\\arctg x + \\arcctg x = \\frac{\\pi}{2} \\quad (x\\in\\mathbb{R})$$" },
+            { subject: "Mathematics", category: "Inverse Trigonometry", sub: "Negative Arguments", name: "Arcsine & Arctangent Negative", formula: "arcsin(-x) = -arcsin(x),  arctg(-x) = -arctg(x)", latex: "$$\\arcsin(-x) = -\\arcsin x, \\quad \\arctg(-x) = -\\arctg x$$" },
+            { subject: "Mathematics", category: "Inverse Trigonometry", sub: "Negative Arguments", name: "Arccosine & Arccotangent Negative", formula: "arccos(-x) = π - arccos(x),  arcctg(-x) = π - arcctg(x)", latex: "$$\\arccos(-x) = \\pi - \\arccos x, \\quad \\arcctg(-x) = \\pi - \\arcctg x$$" },
+            { subject: "Mathematics", category: "Inverse Trigonometry", sub: "Compositions", name: "Sine of Arccosine / Cosine of Arcsine", formula: "sin(arccos x) = √(1 - x²),  cos(arcsin x) = √(1 - x²)", latex: "$$\\sin(\\arccos x) = \\sqrt{1-x^2}, \\quad \\cos(\\arcsin x) = \\sqrt{1-x^2}$$" },
+            { subject: "Mathematics", category: "Inverse Trigonometry", sub: "Compositions", name: "Tangent of Arcsine / Arccosine", formula: "tg(arcsin x) = x / √(1 - x²),  tg(arccos x) = √(1 - x²) / x", latex: "$$\\tg(\\arcsin x) = \\frac{x}{\\sqrt{1-x^2}}, \\quad \\tg(\\arccos x) = \\frac{\\sqrt{1-x^2}}{x}$$" },
+            { subject: "Mathematics", category: "Algebra & Geometry", sub: "Equations", name: "Discriminant", formula: "D = b² - 4ac", latex: "$$D = b^2 - 4ac$$" },
+            { subject: "Mathematics", category: "Algebra & Geometry", sub: "Equations", name: "Quadratic Formula", formula: "x₁,₂ = (-b ± √D) / 2a", latex: "$$x_{1,2} = \\frac{-b \\pm \\sqrt{D}}{2a}$$" },
+            { subject: "Mathematics", category: "Algebra & Geometry", sub: "Equations", name: "Vieta's Formulas", formula: "x₁ + x₂ = -b/a,  x₁ · x₂ = c/a", latex: "$$x_1 + x_2 = -\\frac{b}{a}, \\quad x_1 \\cdot x_2 = \\frac{c}{a}$$" },
+            { subject: "Mathematics", category: "Algebra & Geometry", sub: "Geometry", name: "Pythagorean Theorem", formula: "c² = a² + b²", latex: "$$c^2 = a^2 + b^2$$" },
+            { subject: "Mathematics", category: "Algebra & Geometry", sub: "Geometry", name: "Law of Cosines", formula: "c² = a² + b² - 2ab · cos C", latex: "$$c^2 = a^2 + b^2 - 2ab\\cos C$$" },
+            { subject: "Mathematics", category: "Algebra & Geometry", sub: "Progressions", name: "Arithmetic Progression", formula: "aₙ = a₁ + (n - 1)d,  Sₙ = ((a₁ + aₙ) / 2) · n", latex: "$$a_n = a_1 + (n-1)d, \\quad S_n = \\frac{(a_1 + a_n)}{2} \\cdot n$$" },
+            { subject: "Mathematics", category: "Algebra & Geometry", sub: "Progressions", name: "Geometric Progression", formula: "bₙ = b₁ · qⁿ⁻¹,  Sₙ = b₁(qⁿ - 1) / (q - 1)", latex: "$$b_n = b_1 \\cdot q^{n-1}, \\quad S_n = \\frac{b_1(q^n - 1)}{q - 1}$$" },
+
+            // ================= PHYSICS =================
+            { subject: "Physics", category: "Kinematics", sub: "Linear Motion", name: "Uniform Motion (Coordinate & Path)", formula: "x = x₀ + vₓt,  S = v · t", latex: "$$x = x_0 + v_x t, \\quad S = v \\cdot t$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Linear Motion", name: "Average Velocity", formula: "v_avg = S_total / t_total", latex: "$$v_{avg} = \\frac{S_{total}}{t_{total}}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Linear Motion", name: "Relative Velocity (Galileo)", formula: "v⃗ = v⃗₁ + v⃗₂", latex: "$$\\vec{v} = \\vec{v}_1 + \\vec{v}_2$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Linear Motion", name: "Acceleration", formula: "a = (v - v₀) / t = Δv / Δt", latex: "$$a = \\frac{v - v_0}{t} = \\frac{\\Delta v}{\\Delta t}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Linear Motion", name: "Velocity (Constant Accel)", formula: "v = v₀ + at", latex: "$$v = v_0 + at$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Linear Motion", name: "Displacement (General)", formula: "S = v₀t + (at²) / 2", latex: "$$S = v_0 t + \\frac{at^2}{2}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Linear Motion", name: "Displacement (No Time)", formula: "S = (v² - v₀²) / (2a)", latex: "$$S = \\frac{v^2 - v_0^2}{2a}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Linear Motion", name: "Displacement (Avg Velocity)", formula: "S = ((v₀ + v) / 2) · t", latex: "$$S = \\frac{v_0 + v}{2} \\cdot t$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Linear Motion", name: "Coordinate Equation", formula: "x = x₀ + v₀ₓt + (aₓt²) / 2", latex: "$$x = x_0 + v_{0x}t + \\frac{a_x t^2}{2}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Free Fall & Projectile", name: "Free Fall Height & Velocity", formula: "h = v₀t ± (gt²) / 2,  v = v₀ ± gt", latex: "$$h = v_0 t \\pm \\frac{gt^2}{2}, \\quad v = v_0 \\pm gt$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Free Fall & Projectile", name: "Projectile: Velocity Projections", formula: "v₀ₓ = v₀·cosα,  v₀ᵧ = v₀·sinα", latex: "$$v_{0x} = v_0\\cos\\alpha, \\quad v_{0y} = v_0\\sin\\alpha$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Free Fall & Projectile", name: "Projectile: Total Flight Time", formula: "t_flight = (2v₀ · sinα) / g", latex: "$$t_{flight} = \\frac{2v_0 \\sin\\alpha}{g}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Free Fall & Projectile", name: "Projectile: Max Height", formula: "h_max = (v₀² · sin²α) / (2g)", latex: "$$h_{max} = \\frac{v_0^2 \\sin^2\\alpha}{2g}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Free Fall & Projectile", name: "Projectile: Horizontal Range", formula: "S_x = (v₀² · sin(2α)) / g", latex: "$$S_x = \\frac{v_0^2 \\sin(2\\alpha)}{g}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Rotational", name: "Period & Frequency", formula: "T = t / N = 1 / ν,  ν = N / t = 1 / T", latex: "$$T = \\frac{t}{N} = \\frac{1}{\\nu}, \\quad \\nu = \\frac{N}{t} = \\frac{1}{T}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Rotational", name: "Angular & Linear Velocity", formula: "ω = Δφ / Δt = 2π / T = 2πν,  v = ω · R = 2πR / T", latex: "$$\\omega = \\frac{\\Delta\\varphi}{\\Delta t} = \\frac{2\\pi}{T} = 2\\pi\\nu, \\quad v = \\omega R = \\frac{2\\pi R}{T}$$" },
+            { subject: "Physics", category: "Kinematics", sub: "Rotational", name: "Centripetal & Total Acceleration", formula: "a_n = v² / R = ω²R,  a_τ = εR,  a = √(a_n² + a_τ²)", latex: "$$a_n = \\frac{v^2}{R} = \\omega^2 R, \\quad a_\\tau = \\varepsilon R, \\quad a = \\sqrt{a_n^2 + a_\\tau^2}$$" },
+
+            { subject: "Physics", category: "Dynamics", sub: "Forces & Laws", name: "Newton's Second Law", formula: "F⃗ = m · a⃗  (F⃗ = Δp⃗ / Δt)", latex: "$$\\vec{F} = m\\vec{a} \\quad \\left(\\vec{F} = \\frac{\\Delta\\vec{p}}{\\Delta t}\\right)$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Forces & Laws", name: "Newton's Third Law", formula: "F⃗₁₂ = -F⃗₂₁", latex: "$$\\vec{F}_{12} = -\\vec{F}_{21}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Forces & Laws", name: "Law of Universal Gravitation", formula: "F = G · (m₁ · m₂) / r²", latex: "$$F = G \\frac{m_1 m_2}{r^2}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Forces & Laws", name: "Gravitational Field Strength", formula: "g = G · M / (R + h)²", latex: "$$g = \\frac{GM}{(R+h)^2}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Forces & Laws", name: "First Cosmic Velocity (Orbital)", formula: "v₁ = √(G · M / R) = √(g · R)", latex: "$$v_1 = \\sqrt{\\frac{GM}{R}} = \\sqrt{gR}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Forces & Laws", name: "Weight with Vertical Acceleration", formula: "P = m(g + a) [up],  P = m(g - a) [down]", latex: "$$P = m(g+a) \\text{ [up]}, \\quad P = m(g-a) \\text{ [down]}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Forces & Laws", name: "Hooke's Law (Elastic Force)", formula: "F_el = k · Δx", latex: "$$F_{el} = k \\Delta x$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Forces & Laws", name: "Sliding Friction Force", formula: "F_fr = μ · N", latex: "$$F_{fr} = \\mu N$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Momentum & Energy", name: "Linear Momentum & Impulse", formula: "p⃗ = m · v⃗,  Δp⃗ = F⃗ · Δt", latex: "$$\\vec{p} = m\\vec{v}, \\quad \\Delta\\vec{p} = \\vec{F}\\Delta t$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Momentum & Energy", name: "Conservation of Momentum", formula: "m₁v⃗₁ + m₂v⃗₂ = m₁v⃗₁' + m₂v⃗₂'", latex: "$$m_1\\vec{v}_1 + m_2\\vec{v}_2 = m_1\\vec{v}_1' + m_2\\vec{v}_2'$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Momentum & Energy", name: "Mechanical Work", formula: "A = F · S · cosα", latex: "$$A = FS\\cos\\alpha$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Momentum & Energy", name: "Mechanical Power", formula: "N = A / t = F · v · cosα", latex: "$$N = \\frac{A}{t} = Fv\\cos\\alpha$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Momentum & Energy", name: "Efficiency (Mechanical)", formula: "η = (A_useful / A_total) · 100%", latex: "$$\\eta = \\frac{A_{useful}}{A_{total}} \\cdot 100\\%$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Momentum & Energy", name: "Kinetic Energy", formula: "E_k = (m · v²) / 2 = p² / (2m)", latex: "$$E_k = \\frac{mv^2}{2} = \\frac{p^2}{2m}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Momentum & Energy", name: "Potential Energy (Gravity & Spring)", formula: "E_p = mgh,  E_p = (k · Δx²) / 2", latex: "$$E_p = mgh, \\quad E_p = \\frac{k \\Delta x^2}{2}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Momentum & Energy", name: "Work-Energy Theorem", formula: "A_total = ΔE_k = E_k2 - E_k1", latex: "$$A_{total} = \\Delta E_k = E_{k2} - E_{k1}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Momentum & Energy", name: "Conservation of Mechanical Energy", formula: "E_k1 + E_p1 = E_k2 + E_p2 = const", latex: "$$E_{k1} + E_{p1} = E_{k2} + E_{p2} = \\text{const}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Oscillations & Rotation", name: "Harmonic Oscillation Equation", formula: "x(t) = x_max · cos(ω₀t + φ₀)", latex: "$$x(t) = x_{max}\\cos(\\omega_0 t + \\varphi_0)$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Oscillations & Rotation", name: "Mathematical Pendulum Period", formula: "T = 2π · √(l / g)", latex: "$$T = 2\\pi\\sqrt{\\frac{l}{g}}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Oscillations & Rotation", name: "Spring Pendulum Period", formula: "T = 2π · √(m / k)", latex: "$$T = 2\\pi\\sqrt{\\frac{m}{k}}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Oscillations & Rotation", name: "Rotational Dynamics & Angular Momentum", formula: "M = I · ε,  L = I · ω,  E_rot = (I · ω²) / 2", latex: "$$M = I\\varepsilon, \\quad L = I\\omega, \\quad E_{rot} = \\frac{I\\omega^2}{2}$$" },
+            { subject: "Physics", category: "Dynamics", sub: "Oscillations & Rotation", name: "Moments of Inertia & Steiner's Theorem", formula: "I_ring = mR², I_disk = ½mR², I = I₀ + md²", latex: "$$I_{ring} = mR^2, \\quad I_{disk} = \\frac{1}{2}mR^2, \\quad I = I_0 + md^2$$" },
+
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Statics", name: "Torque (Moment of Force)", formula: "M = F · d", latex: "$$M = Fd$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Statics", name: "Equilibrium Conditions", formula: "ΣF⃗ᵢ = 0,  ΣMᵢ = 0  (F₁d₁ = F₂d₂)", latex: "$$\\sum \\vec{F}_i = 0, \\quad \\sum M_i = 0 \\quad (F_1 d_1 = F_2 d_2)$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Statics", name: "Center of Mass Coordinates", formula: "x_c = (m₁x₁ + m₂x₂ + ...) / (m₁ + m₂ + ...)", latex: "$$x_c = \\frac{m_1 x_1 + m_2 x_2 + \\dots}{m_1 + m_2 + \\dots}$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Hydrostatics", name: "Pressure & Pascal's Law", formula: "P = F / S,  P_total = P₀ + ρgh", latex: "$$P = \\frac{F}{S}, \\quad P_{total} = P_0 + \\rho g h$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Hydrostatics", name: "Hydrostatic Pressure", formula: "P = ρ · g · h", latex: "$$P = \\rho g h$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Hydrostatics", name: "Hydraulic Press Gain", formula: "F₂ / F₁ = S₂ / S₁ = h₁ / h₂", latex: "$$\\frac{F_2}{F_1} = \\frac{S_2}{S_1} = \\frac{h_1}{h_2}$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Hydrostatics", name: "Buoyant Force (Archimedes)", formula: "F_A = ρ_fluid · g · V_submerged", latex: "$$F_A = \\rho_{fluid} g V_{submerged}$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Hydrostatics", name: "Floating Condition", formula: "F_A = mg ⇔ ρ_body · V_body = ρ_fluid · V_sub", latex: "$$F_A = mg \\Leftrightarrow \\rho_{body} V_{body} = \\rho_{fluid} V_{sub}$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Fluid Dynamics", name: "Continuity Equation", formula: "S₁ · v₁ = S₂ · v₂ = const", latex: "$$S_1 v_1 = S_2 v_2 = \\text{const}$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Fluid Dynamics", name: "Bernoulli's Equation", formula: "p₁ + ρgh₁ + (ρv₁²)/2 = p₂ + ρgh₂ + (ρv₂²)/2", latex: "$$p_1 + \\rho g h_1 + \\frac{\\rho v_1^2}{2} = p_2 + \\rho g h_2 + \\frac{\\rho v_2^2}{2}$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Fluid Dynamics", name: "Torricelli's Law (Efflux Speed)", formula: "v = √(2 · g · h)", latex: "$$v = \\sqrt{2gh}$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Fluid Dynamics", name: "Stokes' Drag Force", formula: "F_drag = 6π · η · v · R", latex: "$$F_{drag} = 6\\pi \\eta v R$$" },
+            { subject: "Physics", category: "Statics & Hydrostatics", sub: "Fluid Dynamics", name: "Viscosity Coefficient (Falling Sphere)", formula: "η = 2gR²(ρ_sphere - ρ_fluid) / (9v)", latex: "$$\\eta = \\frac{2gR^2(\\rho_{sphere} - \\rho_{fluid})}{9v}$$" },
+
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Basic MKT", name: "Amount of Substance", formula: "ν = N / N_A = m / M", latex: "$$\\nu = \\frac{N}{N_A} = \\frac{m}{M}$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Basic MKT", name: "Mass & Number Concentration", formula: "m₀ = M / N_A,  n = N / V = ρ / m₀", latex: "$$m_0 = \\frac{M}{N_A}, \\quad n = \\frac{N}{V} = \\frac{\\rho}{m_0}$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Basic MKT", name: "Basic Equation of MKT", formula: "p = ⅓ · n · m₀ · v_rms² = (2/3) · n · E_k", latex: "$$p = \\frac{1}{3} n m_0 v_{rms}^2 = \\frac{2}{3} n E_k$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Basic MKT", name: "Pressure & Boltzmann Constant", formula: "p = n · k · T", latex: "$$p = nkT$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Basic MKT", name: "Absolute Temperature Scale", formula: "T = t°C + 273.15  [K]", latex: "$$T = t_{°C} + 273.15 \\text{ [K]}$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Basic MKT", name: "Average Kinetic Energy of Molecule", formula: "E_k = (3/2) · k · T", latex: "$$E_k = \\frac{3}{2}kT$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Basic MKT", name: "RMS Velocity of Molecules", formula: "v_rms = √(3RT / M) = √(3kT / m₀)", latex: "$$v_{rms} = \\sqrt{\\frac{3RT}{M}} = \\sqrt{\\frac{3kT}{m_0}}$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Gas Laws", name: "Ideal Gas Law (Mendeleev-Clapeyron)", formula: "pV = νRT = (m / M)RT", latex: "$$pV = \\nu RT = \\frac{m}{M}RT$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Gas Laws", name: "Gas Density from Ideal Gas Law", formula: "ρ = (p · M) / (R · T)", latex: "$$\\rho = \\frac{pM}{RT}$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Gas Laws", name: "Combined Gas Law (Clapeyron)", formula: "(p₁ · V₁) / T₁ = (p₂ · V₂) / T₂ = const", latex: "$$\\frac{p_1 V_1}{T_1} = \\frac{p_2 V_2}{T_2} = \\text{const}$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Gas Laws", name: "Boyle's Law (Isothermal, T = const)", formula: "p₁ · V₁ = p₂ · V₂ = const", latex: "$$p_1 V_1 = p_2 V_2 = \\text{const}$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Gas Laws", name: "Gay-Lussac's Law (Isobaric, p = const)", formula: "V₁ / T₁ = V₂ / T₂ = const", latex: "$$\\frac{V_1}{T_1} = \\frac{V_2}{T_2} = \\text{const}$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Gas Laws", name: "Charles's Law (Isochoric, V = const)", formula: "p₁ / T₁ = p₂ / T₂ = const", latex: "$$\\frac{p_1}{T_1} = \\frac{p_2}{T_2} = \\text{const}$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Gas Laws", name: "Dalton's Law (Partial Pressures)", formula: "p_total = p₁ + p₂ + ... + pₙ", latex: "$$p_{total} = p_1 + p_2 + \\dots + p_n$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Humidity & Liquids", name: "Relative Air Humidity", formula: "φ = (p / p_sat) · 100% = (ρ / ρ_sat) · 100%", latex: "$$\\varphi = \\frac{p}{p_{sat}} \\cdot 100\\% = \\frac{\\rho}{\\rho_{sat}} \\cdot 100\\%$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Humidity & Liquids", name: "Surface Tension Force & Energy", formula: "F_surf = σ · l,  ΔE_surf = σ · ΔS", latex: "$$F_{surf} = \\sigma l, \\quad \\Delta E_{surf} = \\sigma \\Delta S$$" },
+            { subject: "Physics", category: "Molecular Physics (MKT)", sub: "Humidity & Liquids", name: "Capillary Rise Height", formula: "h = (2 · σ · cosθ) / (ρ · g · r)", latex: "$$h = \\frac{2\\sigma\\cos\\theta}{\\rho g r}$$" },
+
+            { subject: "Physics", category: "Thermodynamics", sub: "Internal Energy & Work", name: "Internal Energy (Monatomic Gas)", formula: "U = (3/2) · νRT = (3/2) · pV", latex: "$$U = \\frac{3}{2}\\nu RT = \\frac{3}{2}pV$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Internal Energy & Work", name: "Internal Energy (General, i degrees)", formula: "U = (i/2) · νRT", latex: "$$U = \\frac{i}{2}\\nu RT$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Internal Energy & Work", name: "Change in Internal Energy", formula: "ΔU = (i/2) · νR · ΔT = (i/2) · Δ(pV)", latex: "$$\\Delta U = \\frac{i}{2}\\nu R\\Delta T = \\frac{i}{2}\\Delta(pV)$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Internal Energy & Work", name: "Work Done by Gas (Isobaric)", formula: "A = p · ΔV = νR · ΔT", latex: "$$A = p\\Delta V = \\nu R\\Delta T$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Internal Energy & Work", name: "Work Done by Gas (Isothermal)", formula: "A = νRT · ln(V₂ / V₁)", latex: "$$A = \\nu RT\\ln\\frac{V_2}{V_1}$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Laws & Processes", name: "First Law of Thermodynamics", formula: "Q = ΔU + A", latex: "$$Q = \\Delta U + A$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Laws & Processes", name: "First Law in Isochoric (V = const)", formula: "A = 0 ⇒ Q = ΔU", latex: "$$A = 0 \\Rightarrow Q = \\Delta U$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Laws & Processes", name: "First Law in Isothermal (T = const)", formula: "ΔU = 0 ⇒ Q = A", latex: "$$\\Delta U = 0 \\Rightarrow Q = A$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Laws & Processes", name: "Adiabatic Process (Q = 0)", formula: "ΔU = -A,  p · V^γ = const", latex: "$$\\Delta U = -A, \\quad pV^\\gamma = \\text{const}$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Heat & Phase Change", name: "Heat Transfer (Heating / Cooling)", formula: "Q = c · m · ΔT = C · ΔT", latex: "$$Q = cm\\Delta T = C\\Delta T$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Heat & Phase Change", name: "Heat of Melting / Crystallization", formula: "Q = ±λ · m", latex: "$$Q = \\pm \\lambda m$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Heat & Phase Change", name: "Heat of Vaporization / Condensation", formula: "Q = ±L · m", latex: "$$Q = \\pm Lm$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Heat & Phase Change", name: "Heat of Fuel Combustion & Balance", formula: "Q = q · m,  Q₁ + ... + Qₙ = 0", latex: "$$Q = qm, \\quad Q_1 + \\dots + Q_n = 0$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Heat Engines", name: "Heat Engine Efficiency", formula: "η = (A_net / Q_heater) = (Q₁ - |Q₂|) / Q₁", latex: "$$\\eta = \\frac{A_{net}}{Q_{heater}} = \\frac{Q_1 - |Q_2|}{Q_1}$$" },
+            { subject: "Physics", category: "Thermodynamics", sub: "Heat Engines", name: "Carnot Cycle Max Efficiency", formula: "η_max = (T₁ - T₂) / T₁ = 1 - T₂/T₁", latex: "$$\\eta_{max} = \\frac{T_1 - T_2}{T_1} = 1 - \\frac{T_2}{T_1}$$" }
+        ];
+
+        const constantsData = [
+            { name: "Pi", symbol: "π", value: "3.1415926535" },
+            { name: "Euler's Number", symbol: "e", value: "2.7182818284" },
+            { name: "Golden Ratio", symbol: "φ", value: "1.6180339887" },
+            { name: "Free Fall Acceleration", symbol: "g", value: "9.81 m/s² (≈ 10 m/s²)" },
+            { name: "Gravitational Constant", symbol: "G", value: "6.674 × 10⁻¹¹ N·m²/kg²" },
+            { name: "Speed of Light in Vacuum", symbol: "c", value: "3 × 10⁸ m/s" },
+            { name: "Avogadro's Number", symbol: "N_A", value: "6.022 × 10²³ mol⁻¹" },
+            { name: "Universal Gas Constant", symbol: "R", value: "8.314 J/(mol·K)" },
+            { name: "Boltzmann Constant", symbol: "k", value: "1.38 × 10⁻²³ J/K" },
+            { name: "Density of Water (at 4°C)", symbol: "ρ", value: "1000 kg/m³ (1 g/cm³)" },
+            { name: "Specific Heat Capacity of Water", symbol: "c_water", value: "4200 J/(kg·°C)" },
+            { name: "Specific Heat Capacity of Ice", symbol: "c_ice", value: "2100 J/(kg·°C)" },
+            { name: "Latent Heat of Fusion (Ice)", symbol: "λ", value: "3.3 × 10⁵ J/kg" },
+            { name: "Latent Heat of Vaporization (Water)", symbol: "L", value: "2.3 × 10⁶ J/kg" },
+            { name: "Standard Atmospheric Pressure", symbol: "P₀", value: "101,325 Pa (≈ 10⁵ Pa)" },
+            { name: "Absolute Zero Temperature", symbol: "T₀", value: "0 K (-273.15 °C)" },
+            { name: "Elementary Charge", symbol: "e / q_e", value: "1.6 × 10⁻¹⁹ C" },
+            { name: "Mass of Electron", symbol: "m_e", value: "9.11 × 10⁻³¹ kg" },
+            { name: "Mass of Proton", symbol: "m_p", value: "1.673 × 10⁻²⁷ kg" },
+            { name: "Coulomb's Constant", symbol: "k_c", value: "8.99 × 10⁹ N·m²/C²" }
+        ];
+
+        // ===== VARIABLE REGISTRY for Reverse Solver =====
+        const variableRegistry = {
+            'm':   { name: 'Mass m', formulas: ['Newton\'s Second Law', 'Force of Gravity', 'Kinetic Energy', 'Law of Universal Gravitation', 'Linear Momentum & Impulse'] },
+            'a':   { name: 'Acceleration a', formulas: ['Newton\'s Second Law', 'Displacement (General)', 'Velocity (Constant Accel)', 'Displacement (No Time)', 'Centripetal & Total Acceleration'] },
+            'v':   { name: 'Velocity v', formulas: ['Kinetic Energy', 'Displacement (Avg Velocity)', 'Linear Momentum & Impulse', 'Mechanical Power', 'Centripetal & Total Acceleration'] },
+            'v₀':  { name: 'Initial velocity v₀', formulas: ['Velocity (Constant Accel)', 'Displacement (General)', 'Displacement (Avg Velocity)'] },
+            't':   { name: 'Time t', formulas: ['Velocity (Constant Accel)', 'Displacement (General)', 'Displacement (Avg Velocity)', 'Acceleration'] },
+            'S':   { name: 'Displacement S', formulas: ['Displacement (General)', 'Displacement (No Time)', 'Mechanical Work', 'Average Velocity'] },
+            'F':   { name: 'Force F', formulas: ['Newton\'s Second Law', 'Law of Universal Gravitation', 'Hooke\'s Law (Elastic Force)', 'Mechanical Work', 'Torque (Moment of Force)'] },
+            'U':   { name: 'Voltage U', formulas: ['Ohm\'s Law (I = U/R)'] },
+            'R':   { name: 'Resistance R', formulas: ['Ohm\'s Law (I = U/R)'] },
+            'ρ':   { name: 'Density ρ', formulas: ['Hydrostatic Pressure', 'Buoyant Force (Archimedes)', 'Gas Density from Ideal Gas Law'] },
+            'h':   { name: 'Height h', formulas: ['Hydrostatic Pressure', 'Potential Energy (Gravity & Spring)', 'Free Fall Height & Velocity'] },
+            'T':   { name: 'Temperature T', formulas: ['Ideal Gas Pressure', 'RMS Velocity of Molecules', 'Carnot Cycle Max Efficiency', 'Pressure & Boltzmann Constant'] },
+            'V':   { name: 'Volume V', formulas: ['Ideal Gas Pressure', 'Buoyant Force (Archimedes)', 'Ideal Gas Law (Mendeleev-Clapeyron)'] },
+            'ν':   { name: 'Amount ν', formulas: ['Ideal Gas Pressure', 'Internal Energy (Monatomic Gas)'] },
+            'D':   { name: 'Discriminant D', formulas: ['Discriminant', 'Quadratic Formula'] },
+            'c':   { name: 'Hypotenuse c', formulas: ['Pythagorean Theorem', 'Law of Cosines'] },
+            'b':   { name: 'Side b', formulas: ['Pythagorean Theorem', 'Law of Cosines'] },
+            'x':   { name: 'Variable x', formulas: ['Quadratic Formula', 'Vieta\'s Formulas'] },
+            'N':   { name: 'Periods N', formulas: ['Period & Frequency'] },
+            'ω':   { name: 'Angular velocity ω', formulas: ['Angular & Linear Velocity', 'Centripetal & Total Acceleration'] },
+            'g':   { name: 'Gravity g', formulas: ['Force of Gravity', 'Hydrostatic Pressure', 'Mathematical Pendulum Period'] },
+            'k':   { name: 'Stiffness k', formulas: ['Hooke\'s Law (Elastic Force)', 'Spring Pendulum Period'] },
+            'μ':   { name: 'Friction coefficient μ', formulas: ['Sliding Friction Force'] },
+            'η':   { name: 'Efficiency η', formulas: ['Efficiency (Mechanical)', 'Heat Engine Efficiency'] },
+            'E_k': { name: 'Kinetic energy E_k', formulas: ['Kinetic Energy', 'Work-Energy Theorem'] },
+            'E_p': { name: 'Potential energy E_p', formulas: ['Potential Energy (Gravity & Spring)', 'Conservation of Mechanical Energy'] }
+        };
+
+        const subjectIcons = { "Mathematics": "📐", "Physics": "⚡" };
+        let currentSubject = '';
+        let currentActiveCategory = '';
+        let currentActiveSub = 'All';
+        let viewingFavorites = false;
+
+        // ===== Toast =====
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1600);
+        }
+
+        // ===== Copy =====
+        function copyFormulaText(text, event) {
+            if (event) event.stopPropagation();
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!');
+            }).catch(() => {
+                showToast('Copied: ' + text);
+            });
+        }
+
+        // ===== Formula of the Day =====
+        function initFormulaOfTheDay() {
+            const dayIdx = new Date().getDate() % formulas.length;
+            const item = formulas[dayIdx];
+            document.getElementById('fotd-subj').innerText = item.subject;
+            document.getElementById('fotd-name').innerText = item.name;
+            const exprEl = document.getElementById('fotd-expr');
+            if (item.latex && typeof katex !== 'undefined') {
+                exprEl.innerHTML = item.latex;
+                renderMathInElement(exprEl);
+            } else {
+                exprEl.innerText = item.formula;
+            }
+        }
+
+        // ===== Favorites =====
+        let favorites = JSON.parse(localStorage.getItem('formulaVaultFavs') || '[]');
+
+        function toggleFavorite(formulaName, event) {
+            if (event) event.stopPropagation();
+            const index = favorites.indexOf(formulaName);
+            if (index === -1) {
+                favorites.push(formulaName);
+                showToast('Added to Favorites ★');
+            } else {
+                favorites.splice(index, 1);
+                showToast('Removed from Favorites');
+            }
+            localStorage.setItem('formulaVaultFavs', JSON.stringify(favorites));
+            renderSubjectMenu();
+            if (document.getElementById('formula-view').style.display === 'block') {
+                renderFormulas();
+            }
+            const globalQuery = document.getElementById('global-search').value;
+            if (globalQuery.trim()) {
+                handleGlobalSearch(globalQuery);
+            }
+            renderReverseStandalone();
+        }
+
+        function isFavorite(formulaName) {
+            return favorites.includes(formulaName);
+        }
+
+        // ===== Theme =====
+        function toggleTheme() {
+            const html = document.documentElement;
+            const btn = document.getElementById('theme-btn');
+            if (html.getAttribute('data-theme') === 'light') {
+                html.removeAttribute('data-theme');
+                btn.innerText = '🌙';
+                localStorage.setItem('formulaVaultTheme', 'dark');
+            } else {
+                html.setAttribute('data-theme', 'light');
+                btn.innerText = '☀️';
+                localStorage.setItem('formulaVaultTheme', 'light');
+            }
+        }
+
+        if (localStorage.getItem('formulaVaultTheme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.getElementById('theme-btn').innerText = '☀️';
+        }
+
+        // ===== Subject Menu =====
+        function renderSubjectMenu() {
+            const container = document.getElementById('default-subjects');
+            container.innerHTML = '';
+
+            const favBtn = document.createElement('button');
+            favBtn.className = 'menu-btn fav-menu-btn';
+            favBtn.onclick = () => openFavoritesView();
+            favBtn.innerHTML = `<span>★ Favorites</span> <span class="count-badge">(${favorites.length}) ➔</span>`;
+            container.appendChild(favBtn);
+
+            const subjects = [...new Set(formulas.map(f => f.subject))];
+            subjects.forEach(subj => {
+                const count = formulas.filter(f => f.subject === subj).length;
+                const icon = subjectIcons[subj] || "📘";
+                const btn = document.createElement('button');
+                btn.className = 'menu-btn';
+                btn.onclick = () => openSubject(subj);
+                btn.innerHTML = `<span>${icon} ${subj}</span> <span class="count-badge">(${count}) ➔</span>`;
+                container.appendChild(btn);
+            });
+        }
+
+        // ===== Favorites View =====
+        function openFavoritesView() {
+            viewingFavorites = true;
+            currentActiveCategory = 'Favorites';
+            currentActiveSub = 'All';
+            document.getElementById('subject-menu').style.display = 'none';
+            document.getElementById('subject-sections').style.display = 'none';
+            document.getElementById('formula-view').style.display = 'block';
+            document.getElementById('category-title').innerText = '★ Saved Favorites';
+            document.getElementById('formula-back-btn').innerText = '← Back to Subjects';
+            document.getElementById('formula-back-btn').onclick = () => {
+                document.getElementById('formula-view').style.display = 'none';
+                document.getElementById('subject-menu').style.display = 'block';
+            };
+            document.getElementById('search').value = '';
+            document.getElementById('sub-tabs-container').innerHTML = '';
+            document.getElementById('print-subtitle').innerText = 'Favorites';
+            renderFormulas();
+        }
+
+        // ===== Constants & Converter =====
+        function switchConstTab(tab) {
+            document.getElementById('tab-btn-const').classList.toggle('active', tab === 'table');
+            document.getElementById('tab-btn-conv').classList.toggle('active', tab === 'converter');
+            document.getElementById('const-view-table').style.display = tab === 'table' ? 'block' : 'none';
+            document.getElementById('const-view-converter').style.display = tab === 'converter' ? 'block' : 'none';
+        }
+
+        function runUnitConversion() {
+            const type = document.getElementById('conv-type').value;
+            const val = parseFloat(document.getElementById('conv-input').value);
+            const res = document.getElementById('conv-result');
+            if (isNaN(val)) {
+                res.innerText = 'Converted: —';
+                return;
+            }
+            if (type === 'speed') res.innerText = `${val} km/h = ${(val / 3.6).toFixed(3)} m/s`;
+            else if (type === 'speed_rev') res.innerText = `${val} m/s = ${(val * 3.6).toFixed(3)} km/h`;
+            else if (type === 'temp') res.innerText = `${val} °C = ${(val + 273.15).toFixed(2)} K`;
+            else if (type === 'temp_rev') res.innerText = `${val} K = ${(val - 273.15).toFixed(2)} °C`;
+            else if (type === 'pressure') res.innerText = `${val} kPa = ${(val * 1000).toLocaleString()} Pa`;
+            else if (type === 'atm') res.innerText = `${val} atm = ${(val * 101325).toLocaleString()} Pa`;
+            else if (type === 'mass') res.innerText = `${val} g = ${(val / 1000)} kg`;
+            else if (type === 'volume') res.innerText = `${val} L = ${(val / 1000)} m³`;
+        }
+
+        function renderConstants() {
+            const tbody = document.getElementById('constants-tbody');
+            const query = document.getElementById('constants-search').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            const filtered = constantsData.filter(c =>
+                c.name.toLowerCase().includes(query) ||
+                c.symbol.toLowerCase().includes(query) ||
+                c.value.toLowerCase().includes(query)
+            );
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-secondary); padding: 15px;">No constants found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${c.name}</b></td>
+                    <td class="val-cell">${c.symbol}</td>
+                    <td class="val-cell">${c.value}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ===== Subject / Category navigation =====
+        function openSubject(subjectName) {
+            viewingFavorites = false;
+            currentSubject = subjectName;
+            document.getElementById('subject-menu').style.display = 'none';
+            document.getElementById('subject-sections').style.display = 'block';
+            document.getElementById('subject-title').innerText = `${subjectName}: Topics`;
+
+            const listContainer = document.getElementById('dynamic-category-list');
+            listContainer.innerHTML = '';
+
+            const subjectFormulas = formulas.filter(f => f.subject === subjectName);
+            const categories = [...new Set(subjectFormulas.map(f => f.category))];
+
+            categories.forEach(cat => {
+                const count = subjectFormulas.filter(f => f.category === cat).length;
+                const btn = document.createElement('button');
+                btn.className = 'menu-btn';
+                btn.onclick = () => openCategory(cat);
+                btn.innerHTML = `<span>${cat}</span> <span class="count-badge">(${count}) ➔</span>`;
+                listContainer.appendChild(btn);
+            });
+        }
+
+        function backToSubjects() {
+            document.getElementById('subject-sections').style.display = 'none';
+            document.getElementById('subject-menu').style.display = 'block';
+            document.getElementById('global-search').value = '';
+            document.getElementById('global-search-results').innerHTML = '';
+            document.getElementById('default-subjects').style.display = 'block';
+        }
+
+        // ===== Formula Card with KaTeX =====
+        function createFormulaCardElement(f, badgeText) {
+            const card = document.createElement('div');
+            card.className = 'formula-card';
+            const starred = isFavorite(f.name);
+            const safeName = f.name.replace(/'/g, "\\'");
+            const safeFormula = f.formula.replace(/'/g, "\\'");
+            const svgHtml = svgDiagrams[f.name] ? `<div class="card-svg-box">${svgDiagrams[f.name]}</div>` : '';
+
+            let formulaHtml;
+            if (f.latex && typeof katex !== 'undefined') {
+                formulaHtml = f.latex;
+            } else {
+                formulaHtml = f.formula;
+            }
+
+            card.innerHTML = `
+                <div class="card-header-row">
+                    <div>
+                        <span class="sub-badge">${badgeText}</span>
+                        <h3>${f.name}</h3>
+                    </div>
+                    <div class="card-actions">
+                        <button class="icon-action-btn" onclick="copyFormulaText('${safeFormula}', event)" title="Copy Formula">📋</button>
+                        <button class="icon-action-btn fav-star-btn ${starred ? 'active' : ''}" onclick="toggleFavorite('${safeName}', event)" title="Bookmark Formula">
+                            ${starred ? '★' : '☆'}
+                        </button>
+                    </div>
+                </div>
+                <p>${formulaHtml}</p>
+                ${svgHtml}
+            `;
+            const p = card.querySelector('p');
+            if (f.latex && typeof renderMathInElement === 'function') {
+                renderMathInElement(p);
+            }
+            return card;
+        }
+
+        // ===== Global search =====
+        function handleGlobalSearch(query) {
+            const resultsContainer = document.getElementById('global-search-results');
+            const defaultSubjects = document.getElementById('default-subjects');
+            resultsContainer.innerHTML = '';
+            if (!query.trim()) { defaultSubjects.style.display = 'block'; return; }
+            defaultSubjects.style.display = 'none';
+
+            const matched = formulas.filter(f =>
+                f.name.toLowerCase().includes(query.toLowerCase()) ||
+                f.formula.toLowerCase().includes(query.toLowerCase()) ||
+                f.category.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (matched.length === 0) { resultsContainer.innerHTML = '<p style="text-align:center;">No formulas found.</p>'; return; }
+            matched.forEach(f => {
+                resultsContainer.appendChild(createFormulaCardElement(f, `${f.subject} • ${f.category}`));
+            });
+        }
+
+        // ===== Category view =====
+        function openCategory(categoryName) {
+            viewingFavorites = false;
+            currentActiveCategory = categoryName;
+            currentActiveSub = 'All';
+            document.getElementById('subject-sections').style.display = 'none';
+            document.getElementById('formula-view').style.display = 'block';
+            document.getElementById('category-title').innerText = categoryName;
+            document.getElementById('formula-back-btn').innerText = '← Back to Topics';
+            document.getElementById('formula-back-btn').onclick = backToSections;
+            document.getElementById('search').value = '';
+            document.getElementById('print-subtitle').innerText = categoryName;
+            buildSubTabs();
+            renderFormulas();
+        }
+
+        function backToSections() {
+            document.getElementById('formula-view').style.display = 'none';
+            document.getElementById('subject-sections').style.display = 'block';
+        }
+
+        function buildSubTabs() {
+            const container = document.getElementById('sub-tabs-container');
+            container.innerHTML = '';
+            const categoryFormulas = formulas.filter(f => f.category === currentActiveCategory);
+            const subs = ['All', ...new Set(categoryFormulas.map(f => f.sub).filter(Boolean))];
+
+            if (subs.length > 2) {
+                subs.forEach(subName => {
+                    const btn = document.createElement('button');
+                    btn.className = 'sub-tab-btn' + (subName === currentActiveSub ? ' active' : '');
+                    btn.innerText = subName;
+                    btn.onclick = () => { currentActiveSub = subName; buildSubTabs(); renderFormulas(); };
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        function renderFormulas() {
+            const list = document.getElementById('formula-list');
+            const query = document.getElementById('search').value.toLowerCase();
+            list.innerHTML = '';
+
+            let filtered = [];
+            if (viewingFavorites) {
+                filtered = formulas.filter(f => {
+                    const isFav = isFavorite(f.name);
+                    const matchQuery = f.name.toLowerCase().includes(query) || f.formula.toLowerCase().includes(query);
+                    return isFav && matchQuery;
+                });
+            } else {
+                filtered = formulas.filter(f => {
+                    const matchCat = f.category === currentActiveCategory;
+                    const matchSub = currentActiveSub === 'All' || f.sub === currentActiveSub;
+                    const matchQuery = f.name.toLowerCase().includes(query) || f.formula.toLowerCase().includes(query);
+                    return matchCat && matchSub && matchQuery;
+                });
+            }
+
+            if (filtered.length === 0) {
+                list.innerHTML = viewingFavorites
+                    ? '<p style="text-align:center; margin-top:20px;">No favorite formulas yet. Tap ☆ on any card to save it here!</p>'
+                    : '<p style="text-align:center; margin-top:20px;">No formulas found.</p>';
+                return;
+            }
+            filtered.forEach(f => {
+                const badge = viewingFavorites ? `${f.subject} • ${f.category}` : f.sub;
+                list.appendChild(createFormulaCardElement(f, badge));
+            });
+        }
+
+        // ===== Navigation =====
+        function switchMainTab(screenId, btn) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('screen-' + screenId).classList.add('active');
+            if (btn) btn.classList.add('active');
+            if (screenId === 'quiz') initQuiz();
+            if (screenId === 'constants') renderConstants();
+            if (screenId === 'reverse') renderReverseStandalone();
+            if (screenId === 'exam' && examQuestions.length === 0) startExam();
+        }
+
+        // ===== Reverse Solver =====
+        function buildVariableCheckboxes(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            const sortedVars = Object.keys(variableRegistry).sort();
+            sortedVars.forEach(sym => {
+                const info = variableRegistry[sym];
+                const label = document.createElement('label');
+                label.className = 'var-checkbox';
+                label.innerHTML = `<input type="checkbox" value="${sym}" onchange="onVariableToggle(this)"> <span>${sym}</span>`;
+                label.title = info.name;
+                container.appendChild(label);
+            });
+        }
+
+        function onVariableToggle(cb) {
+            cb.closest('.var-checkbox').classList.toggle('checked', cb.checked);
+            renderReverseStandalone();
+        }
+
+        function getCheckedVariables(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return [];
+            return Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+        }
+
+        function findFormulasByVariables(vars) {
+            if (vars.length === 0) return [];
+            const matchedNames = new Set();
+            vars.forEach(v => {
+                const info = variableRegistry[v];
+                if (info) info.formulas.forEach(fn => matchedNames.add(fn));
+            });
+            return formulas.filter(f => matchedNames.has(f.name));
+        }
+
+        function renderReverseStandalone() {
+            const container = document.getElementById('reverse-results-standalone');
+            if (!container) return;
+            const vars = getCheckedVariables('reverse-checkboxes-standalone');
+            container.innerHTML = '';
+
+            if (vars.length === 0) {
+                container.innerHTML = '<p class="reverse-hint">Select at least one variable above to see applicable formulas.</p>';
+                return;
+            }
+            const matched = findFormulasByVariables(vars);
+            if (matched.length === 0) {
+                container.innerHTML = '<p class="reverse-hint">No formulas found for the selected combination. Try more variables.</p>';
+                return;
+            }
+            const header = document.createElement('p');
+            header.style.cssText = 'font-size:0.82rem; font-weight:600; color:var(--text); margin-bottom:6px;';
+            header.innerText = `✅ ${matched.length} applicable formula${matched.length > 1 ? 's' : ''}:`;
+            container.appendChild(header);
+            matched.slice(0, 20).forEach(f => {
+                container.appendChild(createFormulaCardElement(f, `${f.subject} • ${f.category}`));
+            });
+        }
+
+        // ===== CALCULATOR =====
+        let activeCalcMode = 'quick';
+        let calcHistory = [];
+
+        function switchCalcMode(mode) {
+            activeCalcMode = mode;
+            document.getElementById('mode-btn-quick').classList.toggle('active', mode === 'quick');
+            document.getElementById('mode-btn-steps').classList.toggle('active', mode === 'steps');
+            document.getElementById('mode-btn-standard').classList.toggle('active', mode === 'standard');
+
+            const isFormula = (mode === 'quick' || mode === 'steps');
+            document.getElementById('calc-formula-wrapper').style.display = isFormula ? 'block' : 'none';
+            document.getElementById('calc-mode-standard').style.display = mode === 'standard' ? 'block' : 'none';
+
+            if (isFormula) {
+                document.getElementById('calc-mode-desc').innerText = mode === 'quick'
+                    ? 'Instant result calculation'
+                    : 'Detailed step-by-step solution';
+                const stepsBox = document.getElementById('calc-steps');
+                if (mode === 'quick') {
+                    stepsBox.style.display = 'none';
+                } else if (stepsBox.innerHTML.trim() !== '') {
+                    stepsBox.style.display = 'block';
+                }
+            }
+        }
+
+        function addCalcHistory(label, resultText) {
+            calcHistory.unshift({ label, resultText });
+            if (calcHistory.length > 4) calcHistory.pop();
+            renderCalcHistory();
+        }
+
+        function clearCalcHistory() {
+            calcHistory = [];
+            renderCalcHistory();
+        }
+
+        function renderCalcHistory() {
+            const sec = document.getElementById('formula-history-section');
+            const list = document.getElementById('formula-history-list');
+            if (calcHistory.length === 0) {
+                sec.style.display = 'none';
+                return;
+            }
+            sec.style.display = 'block';
+            list.innerHTML = calcHistory.map(h => `
+                <div class="history-item">
+                    <span>${h.label}</span>
+                    <span>${h.resultText}</span>
+                </div>
+            `).join('');
+        }
+
+        function loadCalcExample() {
+            const type = document.getElementById('calc-select').value;
+            const examples = {
+                newton: { 'c-m': 10, 'c-a': 2.5 },
+                gravity: { 'c-m': 50 },
+                kinetic: { 'c-m': 4, 'c-v': 10 },
+                displacement: { 'c-v0': 2, 'c-a': 4, 'c-t': 5 },
+                ohm: { 'c-u': 220, 'c-r': 44 },
+                pressure: { 'c-rho': 1000, 'c-h': 10 },
+                idealgas: { 'c-nu': 2, 'c-T': 300, 'c-V': 0.05 },
+                quadratic: { 'c-a': 1, 'c-b': -5, 'c-c': 6 },
+                pythagoras: { 'c-a': 3, 'c-b': 4 },
+                log: { 'c-base': 2, 'c-arg': 32 }
+            };
+            const vals = examples[type] || {};
+            Object.keys(vals).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = vals[id];
+            });
+            calculateResult();
+        }
+
+        function updateCalcFields() {
+            const type = document.getElementById('calc-select').value;
+            const container = document.getElementById('calc-inputs');
+            container.innerHTML = '';
+
+            const fields = {
+                newton: [
+                    { id: 'c-m', label: 'Mass (m, kg):', ph: 'e.g. 10' },
+                    { id: 'c-a', label: 'Acceleration (a, m/s²):', ph: 'e.g. 2.5' }
+                ],
+                gravity: [
+                    { id: 'c-m', label: 'Mass (m, kg):', ph: 'e.g. 50' }
+                ],
+                kinetic: [
+                    { id: 'c-m', label: 'Mass (m, kg):', ph: 'e.g. 4' },
+                    { id: 'c-v', label: 'Velocity (v, m/s):', ph: 'e.g. 10' }
+                ],
+                displacement: [
+                    { id: 'c-v0', label: 'Initial Velocity (v₀, m/s):', ph: 'e.g. 2' },
+                    { id: 'c-a', label: 'Acceleration (a, m/s²):', ph: 'e.g. 4' },
+                    { id: 'c-t', label: 'Time (t, s):', ph: 'e.g. 5' }
+                ],
+                ohm: [
+                    { id: 'c-u', label: 'Voltage (U, V):', ph: 'e.g. 220' },
+                    { id: 'c-r', label: 'Resistance (R, Ω):', ph: 'e.g. 44' }
+                ],
+                pressure: [
+                    { id: 'c-rho', label: 'Density (ρ, kg/m³):', ph: 'e.g. 1000' },
+                    { id: 'c-h', label: 'Depth/Height (h, m):', ph: 'e.g. 10' }
+                ],
+                idealgas: [
+                    { id: 'c-nu', label: 'Substance amount (ν, mol):', ph: 'e.g. 2' },
+                    { id: 'c-T', label: 'Temperature (T, K):', ph: 'e.g. 300' },
+                    { id: 'c-V', label: 'Volume (V, m³):', ph: 'e.g. 0.05' }
+                ],
+                quadratic: [
+                    { id: 'c-a', label: 'Coefficient a:', ph: 'e.g. 1' },
+                    { id: 'c-b', label: 'Coefficient b:', ph: 'e.g. -5' },
+                    { id: 'c-c', label: 'Coefficient c:', ph: 'e.g. 6' }
+                ],
+                pythagoras: [
+                    { id: 'c-a', label: 'Leg a (m):', ph: 'e.g. 3' },
+                    { id: 'c-b', label: 'Leg b (m):', ph: 'e.g. 4' }
+                ],
+                log: [
+                    { id: 'c-base', label: 'Base a (a > 0, ≠ 1):', ph: 'e.g. 2' },
+                    { id: 'c-arg', label: 'Argument x (> 0):', ph: 'e.g. 32' }
+                ]
+            };
+
+            (fields[type] || []).forEach(f => {
+                container.innerHTML += `
+                    <div class="calc-group">
+                        <label>${f.label}</label>
+                        <input type="number" step="any" id="${f.id}" placeholder="${f.ph}">
+                    </div>
+                `;
+            });
+            document.getElementById('calc-result').innerText = 'Result: —';
+            const stepsBox = document.getElementById('calc-steps');
+            stepsBox.innerHTML = '';
+            stepsBox.style.display = 'none';
+        }
+
+        function getVal(id) { return parseFloat(document.getElementById(id).value); }
+
+        function renderSteps(stepsArray) {
+            const stepsBox = document.getElementById('calc-steps');
+            stepsBox.innerHTML = stepsArray.map(s => `<div class="step-item">${s}</div>`).join('');
+            stepsBox.style.display = (activeCalcMode === 'steps') ? 'block' : 'none';
+        }
+
+        function calculateResult() {
+            const type = document.getElementById('calc-select').value;
+            const res = document.getElementById('calc-result');
+            let steps = [];
+
+            if (type === 'newton') {
+                const m = getVal('c-m'), a = getVal('c-a');
+                if (isNaN(m) || isNaN(a)) return res.innerText = 'Enter valid numbers';
+                const ans = (m * a).toFixed(3);
+                res.innerText = `Force F = ${ans} N`;
+                steps = [
+                    `1. Formula: F = m · a`,
+                    `2. Substitute: F = ${m} kg · ${a} m/s²`,
+                    `3. Result: F = ${ans} N`
+                ];
+                addCalcHistory(`F = ${m}·${a}`, `${ans} N`);
+            } else if (type === 'gravity') {
+                const m = getVal('c-m');
+                if (isNaN(m)) return res.innerText = 'Enter valid mass';
+                const ans = (m * 9.81).toFixed(3);
+                res.innerText = `Gravity Force F_g = ${ans} N`;
+                steps = [
+                    `1. Formula: F_g = m · g (g = 9.81 m/s²)`,
+                    `2. Substitute: F_g = ${m} kg · 9.81 m/s²`,
+                    `3. Result: F_g = ${ans} N`
+                ];
+                addCalcHistory(`F_g (m=${m})`, `${ans} N`);
+            } else if (type === 'kinetic') {
+                const m = getVal('c-m'), v = getVal('c-v');
+                if (isNaN(m) || isNaN(v)) return res.innerText = 'Enter valid numbers';
+                const ans = (0.5 * m * v * v).toFixed(3);
+                res.innerText = `Kinetic Energy E_k = ${ans} J`;
+                steps = [
+                    `1. Formula: E_k = (m · v²) / 2`,
+                    `2. Square velocity: v² = ${v}² = ${(v*v).toFixed(3)}`,
+                    `3. Substitute: E_k = (${m} · ${(v*v).toFixed(3)}) / 2`,
+                    `4. Result: E_k = ${ans} J`
+                ];
+                addCalcHistory(`E_k (m=${m}, v=${v})`, `${ans} J`);
+            } else if (type === 'displacement') {
+                const v0 = getVal('c-v0'), a = getVal('c-a'), t = getVal('c-t');
+                if (isNaN(v0) || isNaN(a) || isNaN(t)) return res.innerText = 'Enter valid numbers';
+                const part1 = v0 * t;
+                const part2 = 0.5 * a * t * t;
+                const ans = (part1 + part2).toFixed(3);
+                res.innerText = `Displacement S = ${ans} m`;
+                steps = [
+                    `1. Formula: S = v₀t + (a·t²) / 2`,
+                    `2. Initial velocity term: ${v0} · ${t} = ${part1.toFixed(3)}`,
+                    `3. Acceleration term: (0.5 · ${a} · ${t}²) = ${part2.toFixed(3)}`,
+                    `4. Sum: S = ${part1.toFixed(3)} + ${part2.toFixed(3)} = ${ans} m`
+                ];
+                addCalcHistory(`S (t=${t}s)`, `${ans} m`);
+            } else if (type === 'ohm') {
+                const u = getVal('c-u'), r = getVal('c-r');
+                if (isNaN(u) || isNaN(r) || r === 0) return res.innerText = 'Enter valid U and R ≠ 0';
+                const ans = (u / r).toFixed(4);
+                res.innerText = `Current I = ${ans} A`;
+                steps = [
+                    `1. Formula: I = U / R`,
+                    `2. Substitute: I = ${u} V / ${r} Ω`,
+                    `3. Result: I = ${ans} A`
+                ];
+                addCalcHistory(`I = ${u}/${r}`, `${ans} A`);
+            } else if (type === 'pressure') {
+                const rho = getVal('c-rho'), h = getVal('c-h');
+                if (isNaN(rho) || isNaN(h)) return res.innerText = 'Enter valid numbers';
+                const p = rho * 9.81 * h;
+                res.innerText = `Pressure P = ${p.toFixed(1)} Pa (${(p / 1000).toFixed(2)} kPa)`;
+                steps = [
+                    `1. Formula: P = ρ · g · h`,
+                    `2. Substitute: P = ${rho} · 9.81 · ${h}`,
+                    `3. Result: P = ${p.toFixed(1)} Pa = ${(p / 1000).toFixed(2)} kPa`
+                ];
+                addCalcHistory(`P (h=${h}m)`, `${(p/1000).toFixed(2)} kPa`);
+            } else if (type === 'idealgas') {
+                const nu = getVal('c-nu'), T = getVal('c-T'), V = getVal('c-V');
+                if (isNaN(nu) || isNaN(T) || isNaN(V) || V === 0) return res.innerText = 'Enter valid ν, T, V ≠ 0';
+                const ans = ((nu * 8.314 * T) / V).toFixed(2);
+                res.innerText = `Gas Pressure p = ${ans} Pa`;
+                steps = [
+                    `1. Formula: p = (ν · R · T) / V  (R = 8.314)`,
+                    `2. Numerator: ${nu} · 8.314 · ${T} = ${(nu * 8.314 * T).toFixed(2)}`,
+                    `3. Divide by V (${V} m³): p = ${ans} Pa`
+                ];
+                addCalcHistory(`Gas p (T=${T}K)`, `${ans} Pa`);
+            } else if (type === 'quadratic') {
+                const a = getVal('c-a'), b = getVal('c-b'), c = getVal('c-c');
+                if (isNaN(a) || isNaN(b) || isNaN(c) || a === 0) return res.innerText = 'Enter valid a ≠ 0, b, c';
+                const D = b * b - 4 * a * c;
+                if (D < 0) {
+                    res.innerHTML = `D = ${D.toFixed(2)} < 0<br>No real roots`;
+                    steps = [
+                        `1. Equation: ${a}x² + (${b})x + (${c}) = 0`,
+                        `2. Discriminant: D = b² - 4ac = (${b})² - 4·(${a})·(${c}) = ${D.toFixed(2)}`,
+                        `3. Since D < 0, there are no real roots.`
+                    ];
+                    addCalcHistory(`Quad (D=${D})`, `No roots`);
+                } else if (D === 0) {
+                    const x = -b / (2 * a);
+                    res.innerHTML = `D = 0<br>x = ${x.toFixed(4)}`;
+                    steps = [
+                        `1. Discriminant: D = (${b})² - 4·(${a})·(${c}) = 0`,
+                        `2. Single root: x = -b / (2a) = ${-b} / ${2*a} = ${x.toFixed(4)}`
+                    ];
+                    addCalcHistory(`Quad (D=0)`, `x=${x.toFixed(2)}`);
+                } else {
+                    const sqrtD = Math.sqrt(D);
+                    const x1 = (-b + sqrtD) / (2 * a);
+                    const x2 = (-b - sqrtD) / (2 * a);
+                    res.innerHTML = `D = ${D.toFixed(2)}<br>x₁ = ${x1.toFixed(4)}, x₂ = ${x2.toFixed(4)}`;
+                    steps = [
+                        `1. Discriminant: D = (${b})² - 4·(${a})·(${c}) = ${D.toFixed(2)}`,
+                        `2. Square root: √D = √${D.toFixed(2)} = ${sqrtD.toFixed(4)}`,
+                        `3. x₁ = (${-b} + ${sqrtD.toFixed(4)}) / ${2*a} = ${x1.toFixed(4)}`,
+                        `4. x₂ = (${-b} - ${sqrtD.toFixed(4)}) / ${2*a} = ${x2.toFixed(4)}`
+                    ];
+                    addCalcHistory(`Quad (a=${a},b=${b})`, `x₁=${x1.toFixed(1)}, x₂=${x2.toFixed(1)}`);
+                }
+            } else if (type === 'pythagoras') {
+                const a = getVal('c-a'), b = getVal('c-b');
+                if (isNaN(a) || isNaN(b)) return res.innerText = 'Enter valid numbers';
+                const cVal = Math.hypot(a, b).toFixed(4);
+                res.innerText = `Hypotenuse c = ${cVal} m`;
+                steps = [
+                    `1. Formula: c = √(a² + b²)`,
+                    `2. Sum of squares: ${a}² + ${b}² = ${a*a} + ${b*b} = ${a*a + b*b}`,
+                    `3. Square root: c = √(${a*a + b*b}) = ${cVal} m`
+                ];
+                addCalcHistory(`Hypot (${a}, ${b})`, `c=${cVal}`);
+            } else if (type === 'log') {
+                const base = getVal('c-base'), arg = getVal('c-arg');
+                if (isNaN(base) || isNaN(arg) || base <= 0 || base === 1 || arg <= 0) {
+                    return res.innerText = 'Invalid: a > 0, a ≠ 1, x > 0';
+                }
+                const ans = (Math.log(arg) / Math.log(base)).toFixed(5);
+                res.innerText = `log_${base}(${arg}) = ${ans}`;
+                steps = [
+                    `1. Base change formula: logₐ(x) = ln(x) / ln(a)`,
+                    `2. Calculate: ln(${arg}) / ln(${base}) = ${Math.log(arg).toFixed(4)} / ${Math.log(base).toFixed(4)}`,
+                    `3. Result: ${ans}`
+                ];
+                addCalcHistory(`log_${base}(${arg})`, `${ans}`);
+            }
+
+            renderSteps(steps);
+        }
+
+        // ===== Standard Calculator =====
+        let stdExpression = '';
+
+        function stdUpdateUI(valText) {
+            document.getElementById('std-expr').innerText = stdExpression.replace(/Math\.sqrt/g, '√');
+            if (valText !== undefined) {
+                document.getElementById('std-val').innerText = valText;
+            }
+        }
+
+        function stdAppend(token) {
+            stdExpression += token;
+            stdUpdateUI(stdExpression.replace(/Math\.sqrt/g, '√'));
+        }
+
+        function stdFunc(fn) {
+            if (fn === 'sqrt') {
+                stdExpression += 'Math.sqrt(';
+                stdUpdateUI(stdExpression.replace(/Math\.sqrt/g, '√'));
+            }
+        }
+
+        function stdBackspace() {
+            if (stdExpression.endsWith('Math.sqrt(')) {
+                stdExpression = stdExpression.slice(0, -10);
+            } else {
+                stdExpression = stdExpression.slice(0, -1);
+            }
+            const displayStr = stdExpression.replace(/Math\.sqrt/g, '√') || '0';
+            stdUpdateUI(displayStr);
+        }
+
+        function stdClear() {
+            stdExpression = '';
+            stdUpdateUI('0');
+        }
+
+        function stdEvaluate() {
+            if (!stdExpression) return;
+            try {
+                let expr = stdExpression;
+                const openBrackets = (expr.match(/\(/g) || []).length;
+                const closeBrackets = (expr.match(/\)/g) || []).length;
+                for (let i = 0; i < openBrackets - closeBrackets; i++) {
+                    expr += ')';
+                }
+
+                const sanitized = expr.replace(/[^0-9+\-*/().%a-zA-Z]/g, '');
+                const result = Function('"use strict";return (' + sanitized + ')')();
+
+                if (!isFinite(result) || isNaN(result)) {
+                    stdUpdateUI('Error');
+                    stdExpression = '';
+                } else {
+                    const rounded = Number(result.toFixed(10));
+                    document.getElementById('std-expr').innerText = expr.replace(/Math\.sqrt/g, '√') + ' =';
+                    document.getElementById('std-val').innerText = rounded;
+                    stdExpression = String(rounded);
+                }
+            } catch (e) {
+                stdUpdateUI('Syntax Error');
+                stdExpression = '';
+            }
+        }
+
+        // ===== QUIZ =====
+        let quizFilter = 'All';
+        let quizDeck = [];
+        let missedDeck = [];
+        let quizIdx = 0;
+        let quizMastered = 0;
+        let isFlipped = false;
+
+        function setQuizSubject(subj, btn) {
+            quizFilter = subj;
+            document.querySelectorAll('#quiz-filter-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            initQuiz();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initQuiz() {
+            if (quizFilter === 'All') {
+                quizDeck = shuffleArray([...formulas]);
+            } else if (quizFilter === 'Favorites') {
+                quizDeck = shuffleArray(formulas.filter(f => isFavorite(f.name)));
+            } else {
+                quizDeck = shuffleArray(formulas.filter(f => f.subject === quizFilter));
+            }
+            missedDeck = [];
+            quizIdx = 0;
+            quizMastered = 0;
+            isFlipped = false;
+            const flashcard = document.getElementById('flashcard');
+            if (flashcard) flashcard.classList.remove('flipped');
+            updateCardDisplay();
+        }
+
+        function practiceMissedCards() {
+            if (missedDeck.length === 0) return;
+            quizDeck = shuffleArray([...missedDeck]);
+            missedDeck = [];
+            quizIdx = 0;
+            isFlipped = false;
+            document.getElementById('flashcard').classList.remove('flipped');
+            updateCardDisplay();
+        }
+
+        function flipCard() {
+            if (quizDeck.length === 0 || quizIdx >= quizDeck.length) return;
+            isFlipped = !isFlipped;
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.toggle('flipped', isFlipped);
+            updateCardDisplay();
+        }
+
+        function rateCard(mastered) {
+            if (quizDeck.length === 0) return;
+            const currentCard = quizDeck[quizIdx];
+            if (mastered) {
+                quizMastered++;
+            } else {
+                if (!missedDeck.some(c => c.name === currentCard.name)) {
+                    missedDeck.push(currentCard);
+                }
+            }
+            quizIdx++;
+            isFlipped = false;
+            document.getElementById('flashcard').classList.remove('flipped');
+            updateCardDisplay();
+        }
+
+        function updateCardDisplay() {
+            const cardText = document.getElementById('card-text');
+            const progressEl = document.getElementById('quiz-progress');
+            const scoreEl = document.getElementById('quiz-score');
+            const missedEl = document.getElementById('quiz-missed');
+            const revealBtn = document.getElementById('quiz-reveal-btn');
+            const rateBtns = document.getElementById('quiz-rate-btns');
+            const practiceMissedBtn = document.getElementById('quiz-practice-missed-btn');
+
+            scoreEl.innerText = quizMastered;
+            missedEl.innerText = missedDeck.length;
+            practiceMissedBtn.style.display = 'none';
+
+            if (quizDeck.length === 0) {
+                progressEl.innerText = '0 / 0';
+                revealBtn.style.display = 'none';
+                rateBtns.style.display = 'none';
+                cardText.innerHTML = `<b>No cards available in "${quizFilter}".</b><br><br><span style="font-size:0.8rem; color:var(--text-secondary);">Star some formulas first or switch subject!</span>`;
+                return;
+            }
+
+            if (quizIdx >= quizDeck.length) {
+                progressEl.innerText = `Done!`;
+                revealBtn.style.display = 'block';
+                revealBtn.innerText = 'Restart Full Quiz';
+                revealBtn.onclick = initQuiz;
+                rateBtns.style.display = 'none';
+
+                if (missedDeck.length > 0) {
+                    practiceMissedBtn.style.display = 'block';
+                    practiceMissedBtn.innerText = `🔄 Practice Missed Cards (${missedDeck.length})`;
+                }
+
+                cardText.innerHTML = `
+                    <span style="font-size:2rem;">🎉</span><br><br>
+                    <b>Session Complete!</b><br><br>
+                    <span style="color:var(--accent);">Mastered: ${quizMastered} | Needs Review: ${missedDeck.length}</span>
+                `;
+                return;
+            }
+
+            revealBtn.onclick = flipCard;
+            revealBtn.innerText = 'Show Answer';
+
+            progressEl.innerText = `Card ${quizIdx + 1} / ${quizDeck.length}`;
+            const current = quizDeck[quizIdx];
+
+            if (isFlipped) {
+                revealBtn.style.display = 'none';
+                rateBtns.style.display = 'grid';
+                let formulaDisplay;
+                if (current.latex && typeof katex !== 'undefined') {
+                    formulaDisplay = current.latex;
+                } else {
+                    formulaDisplay = current.formula;
+                }
+                cardText.innerHTML = `
+                    <span style="color:var(--text-secondary); font-size:0.75rem; text-transform:uppercase;">${current.name}</span><br><br>
+                    <span style="color:var(--accent); font-family:monospace; font-size:1.1rem; word-break:break-word;">${formulaDisplay}</span>
+                `;
+                if (current.latex && typeof renderMathInElement === 'function') {
+                    renderMathInElement(cardText);
+                }
+            } else {
+                revealBtn.style.display = 'block';
+                rateBtns.style.display = 'none';
+                cardText.innerHTML = `
+                    <span style="color:var(--text-secondary); font-size:0.75rem; text-transform:uppercase;">${current.subject} • ${current.category}</span><br><br>
+                    <b>What is the formula for "${current.name}"?</b><br><br>
+                    <span style="color:var(--text-secondary); font-size:0.75rem;">(Tap card to flip)</span>
+                `;
+            }
+        }
+
+        // ===== EXAM PRACTICE =====
+        let examQuestions = [];
+        let examAnswered = 0;
+        let examCorrect = 0;
+
+        function generateExamQuestions(count) {
+            const pool = [...formulas];
+            shuffleArray(pool);
+
+            const questions = [];
+            const usedNames = new Set();
+
+            for (let i = 0; i < pool.length && questions.length < count; i++) {
+                const f = pool[i];
+                if (usedNames.has(f.name)) continue;
+                usedNames.add(f.name);
+
+                const wrongs = [];
+                const otherPool = formulas.filter(x => x.name !== f.name && x.formula !== f.formula);
+                shuffleArray(otherPool);
+                for (let j = 0; j < otherPool.length && wrongs.length < 3; j++) {
+                    if (!wrongs.includes(otherPool[j].formula) && otherPool[j].formula !== f.formula) {
+                        wrongs.push(otherPool[j].formula);
+                    }
+                }
+                if (wrongs.length < 3) continue;
+
+                const options = shuffleArray([f.formula, ...wrongs]);
+                questions.push({
+                    questionText: `Which formula represents "${f.name}"?`,
+                    correctAnswer: f.formula,
+                    options: options,
+                    subject: f.subject,
+                    category: f.category
+                });
+            }
+            return questions;
+        }
+
+        function startExam() {
+            examQuestions = generateExamQuestions(5);
+            examAnswered = 0;
+            examCorrect = 0;
+            renderExam();
+        }
+
+        function renderExam() {
+            const container = document.getElementById('exam-results');
+            const startBtn = document.getElementById('exam-start-btn');
+            container.innerHTML = '';
+
+            if (examQuestions.length === 0) {
+                container.innerHTML = '<p>Could not generate enough questions. Try again.</p>';
+                return;
+            }
+
+            const scoreBox = document.createElement('div');
+            scoreBox.className = 'exam-score-box';
+            const answeredAll = examAnswered >= examQuestions.length;
+            if (answeredAll) {
+                scoreBox.innerHTML = `Test Complete!<br><span class="big-score">${examCorrect} / ${examQuestions.length}</span><br>${examCorrect === examQuestions.length ? '🏆 Perfect score!' : examCorrect >= 3 ? '👍 Good job!' : '📚 Keep practicing!'}`;
+                startBtn.innerText = 'Start New Test';
+                startBtn.onclick = startExam;
+            } else {
+                scoreBox.innerHTML = `Progress: ${examAnswered} / ${examQuestions.length} answered<br>Correct: ${examCorrect}`;
+                startBtn.innerText = 'Restart Test';
+                startBtn.onclick = startExam;
+            }
+            container.appendChild(scoreBox);
+
+            examQuestions.forEach((q, qi) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'exam-question';
+                qDiv.style.animationDelay = (qi * 0.05) + 's';
+
+                const qText = document.createElement('div');
+                qText.className = 'q-text';
+                qText.innerText = `${qi + 1}. ${q.questionText}`;
+                qDiv.appendChild(qText);
+
+                q.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'exam-option';
+                    btn.innerHTML = opt;
+
+                    btn.onclick = () => {
+                        if (btn.disabled) return;
+                        qDiv.querySelectorAll('.exam-option').forEach(b => b.disabled = true);
+                        const isCorrect = opt === q.correctAnswer;
+                        if (isCorrect) {
+                            btn.classList.add('correct');
+                            examCorrect++;
+                        } else {
+                            btn.classList.add('wrong');
+                            qDiv.querySelectorAll('.exam-option').forEach(b => {
+                                if (b.innerHTML === q.correctAnswer || b.innerText === q.correctAnswer) {
+                                    b.classList.add('correct');
+                                }
+                            });
+                        }
+                        examAnswered++;
+                        const sb = document.querySelector('.exam-score-box');
+                        if (sb) {
+                            const answeredAll2 = examAnswered >= examQuestions.length;
+                            if (answeredAll2) {
+                                sb.innerHTML = `Test Complete!<br><span class="big-score">${examCorrect} / ${examQuestions.length}</span><br>${examCorrect === examQuestions.length ? '🏆 Perfect score!' : examCorrect >= 3 ? '👍 Good job!' : '📚 Keep practicing!'}`;
+                                startBtn.innerText = 'Start New Test';
+                                startBtn.onclick = startExam;
+                            } else {
+                                sb.innerHTML = `Progress: ${examAnswered} / ${examQuestions.length} answered<br>Correct: ${examCorrect}`;
+                            }
+                        }
+                    };
+
+                    qDiv.appendChild(btn);
+                });
+
+                container.appendChild(qDiv);
+            });
+
+            if (typeof renderMathInElement === 'function') {
+                container.querySelectorAll('.exam-option').forEach(el => renderMathInElement(el));
+            }
+        }
+
+        // ===== INIT =====
+        initFormulaOfTheDay();
+        renderSubjectMenu();
+        updateCalcFields();
+        buildVariableCheckboxes('reverse-checkboxes-standalone');
+        renderReverseStandalone();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof renderMathInElement === 'function') {
+                    document.querySelectorAll('.formula-card p, .fotd-formula').forEach(el => {
+                        renderMathInElement(el);
+                    });
+                }
+            }, 200);
+        });
+    </script>
+</body>
+</html>
