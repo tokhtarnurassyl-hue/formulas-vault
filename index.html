@@ -1037,139 +1037,6 @@
             .print-header h1 { color: #4f46e5; font-size: 1.6rem; }
             .print-header p { color: #666; font-size: 0.8rem; }
         }
-
-        /* =========================================================
-           ДЕСКТОП / НОУТБУК — адаптация под широкие экраны
-           ========================================================= */
-        @media (min-width: 768px) {
-            html, body {
-                display: block !important;
-                min-height: 100vh;
-                padding: 0;
-                margin: 0;
-            }
-
-            .phone-container {
-                max-width: 1180px !important;
-                width: 100% !important;
-                height: 100vh !important;
-                margin: 0 auto !important;
-                border: none !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-            }
-
-            .app-header {
-                padding: 14px 32px;
-            }
-
-            .app-content {
-                padding: 26px 32px 32px;
-            }
-
-            #formula-list,
-            #default-subjects,
-            #dynamic-category-list,
-            #global-search-results,
-            #exam-results,
-            #reverse-results-standalone {
-                display: grid !important;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 14px;
-                align-items: start;
-            }
-
-            #formula-list .formula-card,
-            #default-subjects .menu-btn,
-            #dynamic-category-list .menu-btn,
-            #exam-results .exam-question {
-                margin-bottom: 0 !important;
-                height: 100%;
-            }
-
-            .nav-bar {
-                height: 60px;
-                justify-content: center;
-                gap: 6px;
-                padding: 0 20px;
-            }
-
-            .nav-item {
-                flex-direction: row;
-                gap: 8px;
-                font-size: 0.82rem;
-                padding: 9px 16px;
-                border-radius: 10px;
-                transition: background 0.2s, color 0.2s;
-            }
-
-            .nav-item:hover {
-                background: var(--input-bg);
-                color: var(--accent);
-            }
-
-            .nav-item.solver-highlight {
-                width: auto;
-                height: auto;
-                margin-top: 0;
-                border-radius: 10px;
-                padding: 9px 18px;
-                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
-                border: none;
-            }
-
-            .nav-item.solver-highlight span {
-                display: inline !important;
-                font-weight: 600;
-            }
-
-            .nav-item.solver-highlight svg {
-                width: 18px;
-                height: 18px;
-            }
-
-            #screen-welcome,
-            #screen-constants,
-            #screen-calc,
-            #screen-quiz,
-            #screen-exam,
-            #screen-reverse .solver-hero,
-            #reverse-checkboxes-standalone,
-            #reverse-results-standalone {
-                max-width: 1000px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            #calc-formula-wrapper {
-                max-width: 720px;
-                margin: 0 auto;
-            }
-
-            #calc-mode-standard {
-                max-width: 420px;
-                margin: 0 auto;
-            }
-
-            #const-view-table,
-            #const-view-converter {
-                max-width: 900px;
-                margin: 0 auto;
-            }
-
-            #screen-quiz .flashcard,
-            #screen-quiz .quiz-stats-bar,
-            #screen-quiz .sub-tabs,
-            #quiz-controls {
-                max-width: 680px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .variable-checkboxes {
-                grid-template-columns: repeat(5, 1fr);
-            }
-
             @media print {
                 .phone-container {
                     max-width: 100% !important;
@@ -1181,35 +1048,7 @@
                     display: block !important;
                 }
             }
-        }
-
-        @media (min-width: 1100px) {
-            .phone-container {
-                max-width: 1360px !important;
-            }
-
-            .app-content {
-                padding: 32px 48px;
-            }
-
-            #formula-list,
-            #default-subjects,
-            #dynamic-category-list,
-            #exam-results {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-
-            #screen-welcome,
-            #screen-constants {
-                max-width: 1100px;
-            }
-
-            .nav-item {
-                font-size: 0.88rem;
-            }
-        }
-        /* Жёсткое переопределение для десктопа */
-@media screen and (min-width: 768px) {
+       @media screen and (min-width: 768px) {
     body {
         display: block !important;
         padding: 0 !important;
@@ -1259,7 +1098,9 @@
 }
 
 @media screen and (min-width: 1100px) {
-    .phone-container { max-width: 1360px !important; }
+    .phone-container {
+        max-width: 1360px !important;
+    }
     #formula-list,
     #default-subjects,
     #dynamic-category-list,
