@@ -1,4 +1,4 @@
-const CACHE_NAME = 'formulavault-v1';
+const CACHE_NAME = 'formulavault-v2';
 const urlsToCache = [
   './',
   './index.html',
